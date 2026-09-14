@@ -5,7 +5,7 @@ import { Bookmark, Check, ChevronDown, Copy, Database, FileUp, Loader2, Play, Ro
 import TurnstileWidget from '@/components/TurnstileWidget';
 import { withBasePath } from '@/lib/base-path';
 import { buildJobBookmark } from '@/lib/job-bookmark';
-import { accessionExamples, demoSequenceOptions, demoSequences, mixedDemoSequence, type DemoSequenceKey } from '@/data/demo-sequences';
+import { accessionExamples, demoSequences, mixedDemoSequence } from '@/data/demo-sequences';
 
 const enzymeClassOptions = [
   ['amidohydrolases', 'Amidohydrolases'],
@@ -64,7 +64,7 @@ export default function PredictionPage() {
   const [sequence, setSequence] = useState('');
   const [accessions, setAccessions] = useState('');
   const [database, setDatabase] = useState<'uniprot'|'ncbi'>('uniprot');
-  const [sequenceExample, setSequenceExample] = useState<'mixed'|DemoSequenceKey>('mixed');
+  const [demoLoaded, setDemoLoaded] = useState(false);
   const [level, setLevel] = useState('Phase4');
   const [phase4Mode, setPhase4Mode] = useState<'automatic'|'specific'>('automatic');
   const [enzymeClass, setEnzymeClass] = useState<EnzymeClass>('amidohydrolases');
@@ -129,7 +129,7 @@ export default function PredictionPage() {
       const response = await fetch(withBasePath('/api/accession'), { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({accessions,database:database,db:database}) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Accession retrieval failed.');
-      setSequenceType('prot');setSequence(data.fasta); setMode('paste');
+      setSequenceType('prot');setSequence(data.fasta);setDemoLoaded(false);setMode('paste');
     } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Accession retrieval failed.'); }
     finally { setBusy(false); }
   }
@@ -158,26 +158,37 @@ export default function PredictionPage() {
   function upload(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0]; if (!file) return;
     setFileName(file.name); const reader = new FileReader();
-    reader.onload = () => { setSequence(String(reader.result || '').trim()); }; reader.readAsText(file);
+    reader.onload = () => { setSequence(String(reader.result || '').trim());setDemoLoaded(false); }; reader.readAsText(file);
   }
 
-  function clear() { setSequence(''); setAccessions(''); setFileName(''); setError(''); setReceipt(null); setLevel('Phase4'); setPhase4Mode('automatic'); setEnzymeClass('amidohydrolases'); }
+  function clear() { setSequence(''); setAccessions(''); setFileName(''); setError(''); setReceipt(null); setLevel('Phase4'); setPhase4Mode('automatic'); setEnzymeClass('amidohydrolases'); setDemoLoaded(false); }
 
-  function selectExample(value: 'mixed'|DemoSequenceKey) {
-    setSequenceExample(value);
+  function demoFor(nextLevel=level,nextMode=phase4Mode,nextClass=enzymeClass) {
+    return nextLevel==='Phase4'&&nextMode==='specific'?demoSequences[nextClass].fasta:mixedDemoSequence;
+  }
+
+  function loadDemo() {
     setSequenceType('prot');
     setMode('paste');
-    setLevel('Phase4');
     setFileName('');
     setError('');
-    if (value === 'mixed') {
-      setSequence(mixedDemoSequence);
-      setPhase4Mode('automatic');
-      return;
-    }
-    setSequence(demoSequences[value].fasta);
-    setEnzymeClass(value);
-    setPhase4Mode('specific');
+    setSequence(demoFor());
+    setDemoLoaded(true);
+  }
+
+  function changeLevel(nextLevel:string) {
+    setLevel(nextLevel);
+    if(demoLoaded)setSequence(demoFor(nextLevel));
+  }
+
+  function changePhase4Mode(nextMode:'automatic'|'specific') {
+    setPhase4Mode(nextMode);
+    if(demoLoaded&&level==='Phase4')setSequence(demoFor(level,nextMode));
+  }
+
+  function changeEnzymeClass(nextClass:EnzymeClass) {
+    setEnzymeClass(nextClass);
+    if(demoLoaded&&level==='Phase4'&&phase4Mode==='specific')setSequence(demoFor(level,phase4Mode,nextClass));
   }
 
   function useAccessionExample() {
@@ -190,14 +201,13 @@ export default function PredictionPage() {
     <header className="text-center"><p className="eyebrow">MINpred analysis</p><h1 className="mt-3 font-display text-5xl font-semibold text-[var(--forest-dark)]">Predict nitrogen mineralization enzyme function</h1><p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-[var(--muted)]">Submit protein or nucleotide sequences for enzyme screening, mineralization classification, and EC assignment.</p></header>
     {error && <div role="alert" className="rounded-xl border border-[#e2b9bf] bg-[#fff7f7] px-4 py-3 text-sm font-semibold text-[var(--danger)]">{error}</div>}
     <section className="rounded-[2rem] border border-[var(--line)] bg-white shadow-[0_24px_70px_rgba(45,42,38,.08)]">
-      <div className="border-b border-[var(--line)] p-6 sm:p-8"><div className="grid gap-6 sm:grid-cols-[1fr_1.5fr]"><div><p className="eyebrow">Step 1</p><h2 className="mt-1 font-display text-2xl font-semibold">Choose the input</h2></div><div className="grid gap-4 sm:grid-cols-2"><div><p className="text-sm font-bold">Sequence type</p><RoundedSelect ariaLabel="Sequence type" value={sequenceType} options={[["prot","Protein"],["nucl","Nucleotide"]]} onChange={value=>setSequenceType(value as 'prot'|'nucl')}/></div><fieldset><legend className="text-sm font-bold">Input method</legend><div className="mt-2 grid grid-cols-3 gap-1 rounded-xl bg-[var(--mist)] p-1">{(['paste','upload','accession'] as const).map(item=><button key={item} type="button" onClick={()=>{setMode(item);if(item==='accession')setSequenceType('prot');}} className={`rounded-lg px-2 py-3 text-xs font-bold capitalize ${mode===item?'bg-white text-[var(--forest)] shadow-sm':'text-[var(--muted)]'}`}>{item}</button>)}</div></fieldset></div></div>{sequenceType==='nucl'&&<p className="mt-4 rounded-xl bg-[var(--mineral-soft)] px-4 py-3 text-xs text-[var(--muted)]">TransDecoder.LongOrfs translates nucleotide records before MINpred analysis.</p>}</div>
+      <div className="border-b border-[var(--line)] p-6 sm:p-8"><div className="grid gap-6 sm:grid-cols-[1fr_1.5fr]"><div><p className="eyebrow">Step 1</p><h2 className="mt-1 font-display text-2xl font-semibold">Choose the input</h2></div><div className="grid gap-4 sm:grid-cols-2"><div><p className="text-sm font-bold">Sequence type</p><RoundedSelect ariaLabel="Sequence type" value={sequenceType} options={[["prot","Protein"],["nucl","Nucleotide"]]} onChange={value=>{const next=value as 'prot'|'nucl';setSequenceType(next);if(next==='nucl'&&demoLoaded){setSequence('');setDemoLoaded(false);}}}/></div><fieldset><legend className="text-sm font-bold">Input method</legend><div className="mt-2 grid grid-cols-3 gap-1 rounded-xl bg-[var(--mist)] p-1">{(['paste','upload','accession'] as const).map(item=><button key={item} type="button" onClick={()=>{setMode(item);if(item==='accession'){setSequenceType('prot');setDemoLoaded(false);}}} className={`rounded-lg px-2 py-3 text-xs font-bold capitalize ${mode===item?'bg-white text-[var(--forest)] shadow-sm':'text-[var(--muted)]'}`}>{item}</button>)}</div></fieldset></div></div>{sequenceType==='nucl'&&<p className="mt-4 rounded-xl bg-[var(--mineral-soft)] px-4 py-3 text-xs text-[var(--muted)]">TransDecoder.LongOrfs translates nucleotide records before MINpred analysis.</p>}</div>
       <div className="border-b border-[var(--line)] p-6 sm:p-8"><div className="flex flex-wrap items-end justify-between gap-4"><div><p className="eyebrow">Step 2</p><h2 className="mt-1 font-display text-2xl font-semibold">Add sequence data</h2></div><button type="button" onClick={clear} className="btn-secondary"><RotateCcw className="h-3.5 w-3.5"/>Clear</button></div>
-        {mode==='paste'&&<div className="mt-6"><p className="text-sm font-bold">Use an example dataset</p><RoundedSelect ariaLabel="Example dataset" value={sequenceExample} options={demoSequenceOptions} onChange={value=>selectExample(value as 'mixed'|DemoSequenceKey)}/><p className="mt-2 text-xs leading-5 text-[var(--muted)]">Selection loads immediately. The mixed panel uses automatic Phase IV routing; a class example selects its matching Phase IV class.</p></div>}
         {mode==='accession'&&<div className="mt-6 rounded-2xl border border-[var(--line)] bg-[#faf9f7] p-4"><div className="grid gap-4 sm:grid-cols-[180px_1fr_auto] sm:items-start"><div><p className="text-sm font-bold">Protein database</p><RoundedSelect ariaLabel="Protein database" value={database} options={[["uniprot","UniProtKB"],["ncbi","NCBI Protein"]]} onChange={value=>setDatabase(value as 'uniprot'|'ncbi')}/></div><div><label htmlFor="protein-accessions" className="text-sm font-bold">Protein accession</label><input id="protein-accessions" className="field mt-2" value={accessions} onChange={(e)=>setAccessions(e.target.value)} placeholder="Enter one or more accessions"/><button type="button" onClick={useAccessionExample} className="mt-2 text-left text-xs font-semibold text-[var(--forest)] underline decoration-[var(--mineral)] underline-offset-4">Use example: {accessionExamples[database].label}</button></div><button type="button" onClick={fetchAccessions} className="btn-secondary mt-7 min-h-12"><Database className="h-4 w-4"/>Retrieve sequence</button></div><p className="mt-3 text-xs leading-5 text-[var(--muted)]">Accession retrieval accepts protein records only. Use spaces, commas, or new lines for multiple accessions.</p></div>}
         {mode==='upload'&&<label className="mt-6 flex min-h-28 cursor-pointer items-center justify-center gap-4 rounded-2xl border border-dashed border-[#b8b4ad] bg-[#faf9f7] px-5 text-center"><FileUp className="h-6 w-6 text-[var(--forest)]"/><span><b className="block text-sm">Choose a FASTA file</b><span className="text-xs text-[var(--muted)]">{fileName||'.fasta, .fa, .faa, or .txt'}</span></span><input className="sr-only" type="file" accept=".fasta,.fa,.faa,.txt" onChange={upload}/></label>}
-        {mode!=='accession'&&<><textarea id="minpred-fasta" aria-label="FASTA sequence" rows={11} className="field mt-6 resize-y font-mono text-xs leading-6" value={sequence} onChange={(e)=>setSequence(e.target.value)} placeholder=">protein_id&#10;MSEQUENCE..."/><p className="mt-2 text-xs text-[var(--muted)]">{count?`${count} record${count===1?'':'s'} detected`:sequenceType==='nucl'?'Accepted symbols: A, C, G, T, U, and N.':'Standard amino acids and X are accepted.'}</p></>}</div>
-      <div className="p-6 sm:p-8"><div><p className="eyebrow">Step 3</p><div className="mt-1 flex flex-col justify-between gap-1 sm:flex-row sm:items-end"><h2 className="font-display text-2xl font-semibold">Choose the result</h2><p className="text-xs leading-5 text-[var(--muted)]">Each option includes the preceding phases.</p></div><div className="mt-5 grid gap-3 sm:grid-cols-2">{[['Phase1','Phase I','Enzyme or non-enzyme'],['Phase2','Phase II','Nitrogen mineralization screening'],['Phase3','Phase III','Mineralization enzyme class'],['Phase4','Phase IV','Class-specific EC assignment']].map(([value,phase,label])=><label key={value} className={`flex cursor-pointer items-center gap-4 rounded-xl border px-4 py-3 ${level===value?'border-[var(--forest)] bg-[#f1f3f4]':'border-[var(--line)]'}`}><input type="radio" name="level" value={value} checked={level===value} onChange={()=>setLevel(value)} className="h-4 w-4 accent-[#46545c]"/><span><strong className="block text-sm">{phase}</strong><span className="text-xs text-[var(--muted)]">{label}</span></span></label>)}</div></div>
-        {level==='Phase4'&&<fieldset className="mt-5 rounded-2xl bg-[var(--mist)] p-4"><legend className="px-1 text-sm font-bold">How should the enzyme class be chosen?</legend><div className="mt-2 grid gap-3 sm:grid-cols-2"><label className={`cursor-pointer rounded-xl border bg-white p-4 ${phase4Mode==='automatic'?'border-[var(--forest)] ring-1 ring-[var(--forest)]':'border-[var(--line)]'}`}><span className="flex items-start gap-3"><input type="radio" name="phase4-mode" checked={phase4Mode==='automatic'} onChange={()=>setPhase4Mode('automatic')} className="mt-0.5 h-4 w-4 accent-[#46545c]"/><span><strong className="block text-sm">Determine automatically</strong><span className="mt-1 block text-xs leading-5 text-[var(--muted)]">Use the Phase III prediction for each sequence.</span></span></span></label><label className={`cursor-pointer rounded-xl border bg-white p-4 ${phase4Mode==='specific'?'border-[var(--forest)] ring-1 ring-[var(--forest)]':'border-[var(--line)]'}`}><span className="flex items-start gap-3"><input type="radio" name="phase4-mode" checked={phase4Mode==='specific'} onChange={()=>setPhase4Mode('specific')} className="mt-0.5 h-4 w-4 accent-[#46545c]"/><span><strong className="block text-sm">Use a specific class</strong><span className="mt-1 block text-xs leading-5 text-[var(--muted)]">Run Phase IV only for sequences assigned to that class.</span></span></span></label></div>{phase4Mode==='specific'&&<div className="mt-4"><p className="text-sm font-bold">Select enzyme class</p><RoundedSelect ariaLabel="Select enzyme class" value={enzymeClass} options={enzymeClassOptions} onChange={value=>setEnzymeClass(value as EnzymeClass)} dropUp/></div>}</fieldset>}
+        {mode!=='accession'&&<><div className="mt-6 flex flex-wrap items-end justify-between gap-3"><div><label htmlFor="minpred-fasta" className="text-sm font-bold">FASTA sequence</label><p className="mt-1 text-xs leading-5 text-[var(--muted)]">{level==='Phase4'&&phase4Mode==='specific'?`Demo uses the ${enzymeClassOptions.find(([value])=>value===enzymeClass)?.[1]} example.`:'Demo uses a mixed 10-sequence panel.'}</p></div><button type="button" onClick={loadDemo} className="btn-secondary">Load demo</button></div><textarea id="minpred-fasta" aria-label="FASTA sequence" rows={11} className="field mt-3 resize-y font-mono text-xs leading-6" value={sequence} onChange={(e)=>{setSequence(e.target.value);setDemoLoaded(false);}} placeholder=">protein_id&#10;MSEQUENCE..."/><p className="mt-2 text-xs text-[var(--muted)]">{count?`${count} record${count===1?'':'s'} detected${demoLoaded?' · demo updates with the selected Phase IV route':''}`:sequenceType==='nucl'?'Accepted symbols: A, C, G, T, U, and N.':'Standard amino acids and X are accepted.'}</p></>}</div>
+      <div className="p-6 sm:p-8"><div><p className="eyebrow">Step 3</p><div className="mt-1 flex flex-col justify-between gap-1 sm:flex-row sm:items-end"><h2 className="font-display text-2xl font-semibold">Choose the result</h2><p className="text-xs leading-5 text-[var(--muted)]">Each option includes the preceding phases.</p></div><div className="mt-5 grid gap-3 sm:grid-cols-2">{[['Phase1','Phase I','Enzyme or non-enzyme'],['Phase2','Phase II','Nitrogen mineralization screening'],['Phase3','Phase III','Mineralization enzyme class'],['Phase4','Phase IV','Class-specific EC assignment']].map(([value,phase,label])=><label key={value} className={`flex cursor-pointer items-center gap-4 rounded-xl border px-4 py-3 ${level===value?'border-[var(--forest)] bg-[#f1f3f4]':'border-[var(--line)]'}`}><input type="radio" name="level" value={value} checked={level===value} onChange={()=>changeLevel(value)} className="h-4 w-4 accent-[#46545c]"/><span><strong className="block text-sm">{phase}</strong><span className="text-xs text-[var(--muted)]">{label}</span></span></label>)}</div></div>
+        {level==='Phase4'&&<fieldset className="mt-5 rounded-2xl bg-[var(--mist)] p-4"><legend className="px-1 text-sm font-bold">How should the enzyme class be chosen?</legend><div className="mt-2 grid gap-3 sm:grid-cols-2"><label className={`cursor-pointer rounded-xl border bg-white p-4 ${phase4Mode==='automatic'?'border-[var(--forest)] ring-1 ring-[var(--forest)]':'border-[var(--line)]'}`}><span className="flex items-start gap-3"><input type="radio" name="phase4-mode" checked={phase4Mode==='automatic'} onChange={()=>changePhase4Mode('automatic')} className="mt-0.5 h-4 w-4 accent-[#46545c]"/><span><strong className="block text-sm">Determine automatically</strong><span className="mt-1 block text-xs leading-5 text-[var(--muted)]">Use the Phase III prediction for each sequence.</span></span></span></label><label className={`cursor-pointer rounded-xl border bg-white p-4 ${phase4Mode==='specific'?'border-[var(--forest)] ring-1 ring-[var(--forest)]':'border-[var(--line)]'}`}><span className="flex items-start gap-3"><input type="radio" name="phase4-mode" checked={phase4Mode==='specific'} onChange={()=>changePhase4Mode('specific')} className="mt-0.5 h-4 w-4 accent-[#46545c]"/><span><strong className="block text-sm">Use a specific class</strong><span className="mt-1 block text-xs leading-5 text-[var(--muted)]">Run Phase IV only for sequences assigned to that class.</span></span></span></label></div>{phase4Mode==='specific'&&<div className="mt-4"><p className="text-sm font-bold">Select enzyme class</p><RoundedSelect ariaLabel="Select enzyme class" value={enzymeClass} options={enzymeClassOptions} onChange={value=>changeEnzymeClass(value as EnzymeClass)} dropUp/></div>}</fieldset>}
         <div className="mt-7 grid gap-4 border-t border-[var(--line)] pt-6 sm:grid-cols-[1fr_auto] sm:items-center"><div><p className="text-sm font-bold">Submission verification</p><div className="mt-2 min-h-8">{!securityConfig.loaded?<div className="flex min-h-8 items-center gap-2 text-xs"><Loader2 className="h-4 w-4 animate-spin"/>Loading verification...</div>:securityConfig.error?<p className="text-xs text-[var(--danger)]">{securityConfig.error}</p>:securityConfig.required?(turnstile?<span className="flex items-center gap-2 text-xs font-semibold text-[var(--forest)]"><ShieldCheck className="h-4 w-4"/>Verification complete</span>:<TurnstileWidget siteKey={securityConfig.siteKey} resetKey={resetKey} onToken={setTurnstile}/>):<span className="flex items-center gap-2 text-xs text-[var(--muted)]"><ShieldCheck className="h-4 w-4"/>Ready to submit. Results are retained for 30 days.</span>}</div></div><button type="button" disabled={busy||!securityConfig.loaded||Boolean(securityConfig.error)} onClick={submit} className="btn-primary min-w-48 px-6 py-3">{busy?<Loader2 className="h-4 w-4 animate-spin"/>:<Play className="h-4 w-4"/>}{busy?'Running...':'Start prediction'}</button></div>
       </div>
     </section>
