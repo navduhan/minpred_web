@@ -25,8 +25,25 @@
 }
 
 .font-display { font-family: inherit; letter-spacing: -.015em; }
-.results-page { font-family: "Avenir Next", Avenir, "Helvetica Neue", sans-serif; }
-.results-title { font-family: Charter, "Iowan Old Style", "Palatino Linotype", Georgia, serif; letter-spacing: -.025em; }
+.results-page { color: #30383c; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 1rem; }
+.results-title { font-family: inherit; font-weight: 700; letter-spacing: -.018em; }
+.results-page .btn-secondary { font-size: .95rem; }
+.probability-key { display: flex; flex-wrap: wrap; align-items: center; gap: .55rem 1rem; color: #60696d; font-size: .78rem; font-weight: 650; }
+.probability-key-title { color: var(--forest-dark); font-weight: 800; }
+.probability-key span { display: inline-flex; align-items: center; gap: .38rem; }
+.probability-dot { width: .65rem; height: .65rem; border-radius: 999px; }
+.probability-dot-1 { background: #a77a20; }
+.probability-dot-2 { background: #507584; }
+.probability-dot-3 { background: #a65f49; }
+.probability-rank { position: relative; min-width: 6.2rem; }
+.probability-rank > span:last-child { font-variant-numeric: tabular-nums; font-weight: 750; }
+.probability-rank-number { display: inline-grid; width: 1.3rem; height: 1.3rem; margin-right: .5rem; place-items: center; border-radius: 999px; color: white; font-size: .68rem; font-weight: 850; line-height: 1; vertical-align: .08rem; }
+.probability-rank-1 { background: #fbf5e8; box-shadow: inset 3px 0 #a77a20; }
+.probability-rank-2 { background: #edf4f6; box-shadow: inset 3px 0 #507584; }
+.probability-rank-3 { background: #f8efec; box-shadow: inset 3px 0 #a65f49; }
+.probability-rank-1 .probability-rank-number { background: #a77a20; }
+.probability-rank-2 .probability-rank-number { background: #507584; }
+.probability-rank-3 .probability-rank-number { background: #a65f49; }
 .nav-link { display: inline-flex; align-items: center; gap: .38rem; border-bottom: 2px solid transparent; padding: .65rem .3rem .55rem; color: #697174; font-size: .78rem; font-weight: 700; transition: color .18s ease, border-color .18s ease; }
 .nav-link:hover { background: var(--mist); color: var(--forest); }
 .nav-link-active { border-color: var(--mineral); background: transparent; color: var(--forest-dark); }

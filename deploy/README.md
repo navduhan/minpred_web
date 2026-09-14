@@ -33,7 +33,7 @@ The recommended interactive setup from the repository root is:
 ./start.sh
 ```
 
-It safely creates `deploy/docker.env`, validates the selected Compose configuration, builds the images, starts the services, and performs a health check. Rootless Podman builds are serialized to one multi-stage build job to avoid overloading Buildah. On later runs, the menu can start existing images without rebuilding, pull Git updates and rebuild, or replace this project's containers and rebuild fresh images without cache while preserving job data and downloads. The corresponding direct modes are `--start-only`, `--update`, and `--rebuild`. To populate and validate the environment file without starting containers, run `./start.sh --configure-only`.
+It safely creates `deploy/docker.env`, validates the selected Compose configuration, builds the images, starts the services, and performs a health check. Rootless Podman builds are serialized to one multi-stage build job to avoid overloading Buildah. On later runs, the menu can start existing images without rebuilding, pull Git updates, rebuild changed images, and force-recreate the Podman containers, or replace this project's containers and rebuild fresh images without cache while preserving job data and downloads. The corresponding direct modes are `--start-only`, `--update`, and `--rebuild`. To populate and validate the environment file without starting containers, run `./start.sh --configure-only`.
 
 ### Rootless Podman (recommended on RHEL-family VMs)
 
