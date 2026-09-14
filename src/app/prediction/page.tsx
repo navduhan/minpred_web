@@ -7,6 +7,21 @@ import { withBasePath } from '@/lib/base-path';
 import { buildJobBookmark } from '@/lib/job-bookmark';
 import { demoSequences } from '@/data/demo-sequences';
 
+const enzymeClassOptions = [
+  ['all', 'Automatic (use each Phase III prediction)'],
+  ['amidohydrolases', 'Amidohydrolases'],
+  ['aminopeptidases', 'Aminopeptidases'],
+  ['aspartic', 'Aspartic endopeptidases'],
+  ['cysteine', 'Cysteine endopeptidases'],
+  ['dipeptidases', 'Dipeptidases'],
+  ['dipeptidyl', 'Dipeptidyl-peptidases'],
+  ['metalloendopeptidases', 'Metalloendopeptidases'],
+  ['metallopeptidases', 'Metallopeptidases'],
+  ['omega', 'Omega peptidases'],
+  ['serine', 'Serine endopeptidases'],
+] as const;
+type EnzymeClass = typeof enzymeClassOptions[number][0];
+
 type Job = { jobId: string; jobToken?: string; status: 'queued'|'running'|'completed'|'failed'; message?: string; error?: string; results?: Record<string, Record<string,string|number>[]> };
 
 async function parseResponse(response: Response) {
@@ -33,6 +48,7 @@ export default function PredictionPage() {
   const [accessions, setAccessions] = useState('');
   const [database, setDatabase] = useState<'uniprot'|'ncbi'>('uniprot');
   const [level, setLevel] = useState('Phase4');
+  const [enzymeClass, setEnzymeClass] = useState<EnzymeClass>('all');
   const [fileName, setFileName] = useState('');
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState('Preparing secure submission…');
@@ -106,7 +122,7 @@ export default function PredictionPage() {
     if (securityConfig.required && !turnstile) return setError('Complete the anti-bot check before submitting.');
     setBusy(true); setStatus('Submitting your sequences…'); setError('');
     try {
-      const response = await fetch(withBasePath('/api/predict'), { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({sequence,sequenceType,level,enzymeClass:'all',turnstileToken:turnstile}) });
+      const response = await fetch(withBasePath('/api/predict'), { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({sequence,sequenceType,level,enzymeClass:level==='Phase4'?enzymeClass:'all',turnstileToken:turnstile}) });
       const job = await parseResponse(response);
       if (!response.ok || !job.jobToken) throw new Error(job.error || 'Job submission failed.');
       const active = {jobId:job.jobId,jobToken:job.jobToken};
@@ -126,7 +142,7 @@ export default function PredictionPage() {
     reader.onload = () => { setSequence(String(reader.result || '').trim()); }; reader.readAsText(file);
   }
 
-  function clear() { setSequence(''); setAccessions(''); setFileName(''); setError(''); setReceipt(null); setLevel('Phase4'); }
+  function clear() { setSequence(''); setAccessions(''); setFileName(''); setError(''); setReceipt(null); setLevel('Phase4'); setEnzymeClass('all'); }
 
   function loadExample() {
     setSequenceType('prot');
@@ -143,8 +159,8 @@ export default function PredictionPage() {
         {mode==='accession'&&<div className="mt-6 grid gap-3 sm:grid-cols-[150px_1fr_auto]"><select className="field" value={database} onChange={(e)=>setDatabase(e.target.value as 'uniprot'|'ncbi')}><option value="uniprot">UniProtKB</option><option value="ncbi">NCBI Protein</option></select><input className="field" value={accessions} onChange={(e)=>setAccessions(e.target.value)} placeholder="Enter one or more accessions"/><button type="button" onClick={fetchAccessions} className="btn-secondary"><Database className="h-4 w-4"/>Retrieve</button></div>}
         {mode==='upload'&&<label className="mt-6 flex min-h-28 cursor-pointer items-center justify-center gap-4 rounded-2xl border border-dashed border-[#b8b4ad] bg-[#faf9f7] px-5 text-center"><FileUp className="h-6 w-6 text-[var(--forest)]"/><span><b className="block text-sm">Choose a FASTA file</b><span className="text-xs text-[var(--muted)]">{fileName||'.fasta, .fa, .faa, or .txt'}</span></span><input className="sr-only" type="file" accept=".fasta,.fa,.faa,.txt" onChange={upload}/></label>}
         <textarea id="minpred-fasta" aria-label="FASTA sequence" rows={11} className="field mt-6 resize-y font-mono text-xs leading-6" value={sequence} onChange={(e)=>setSequence(e.target.value)} placeholder=">protein_id&#10;MSEQUENCE..."/><p className="mt-2 text-xs text-[var(--muted)]">{count?`${count} record${count===1?'':'s'} detected`:sequenceType==='nucl'?'Accepted symbols: A, C, G, T, U, and N.':'Standard amino acids and X are accepted.'}</p></div>
-      <div className="p-6 sm:p-8"><div className="grid gap-7 sm:grid-cols-[1fr_1.5fr]"><div><p className="eyebrow">Step 3</p><h2 className="mt-1 font-display text-2xl font-semibold">Choose the result</h2><p className="mt-2 text-xs leading-5 text-[var(--muted)]">Each option includes the preceding phases.</p></div><div className="space-y-2">{[['Phase1','Phase I','Enzyme or non-enzyme'],['Phase2','Phase II','Nitrogen mineralization screening'],['Phase3','Phase III','Mineralization enzyme class'],['Phase4','Phase IV','Automatic class-specific EC assignment']].map(([value,phase,label])=><label key={value} className={`flex cursor-pointer items-center gap-4 rounded-xl border px-4 py-3 ${level===value?'border-[var(--forest)] bg-[#fbf4f5]':'border-[var(--line)]'}`}><input type="radio" name="level" value={value} checked={level===value} onChange={()=>setLevel(value)} className="h-4 w-4 accent-[#7b2d3b]"/><span><strong className="block text-sm">{phase}</strong><span className="text-xs text-[var(--muted)]">{label}</span></span></label>)}</div></div>
-        {level==='Phase4'&&<p className="mt-5 rounded-xl bg-[var(--mist)] px-4 py-3 text-xs leading-5 text-[var(--muted)]">Phase III selects an enzyme class for each sequence. Phase IV then uses the matching EC model automatically.</p>}
+      <div className="p-6 sm:p-8"><div><p className="eyebrow">Step 3</p><div className="mt-1 flex flex-col justify-between gap-1 sm:flex-row sm:items-end"><h2 className="font-display text-2xl font-semibold">Choose the result</h2><p className="text-xs leading-5 text-[var(--muted)]">Each option includes the preceding phases.</p></div><div className="mt-5 grid gap-3 sm:grid-cols-2">{[['Phase1','Phase I','Enzyme or non-enzyme'],['Phase2','Phase II','Nitrogen mineralization screening'],['Phase3','Phase III','Mineralization enzyme class'],['Phase4','Phase IV','Automatic class-specific EC assignment']].map(([value,phase,label])=><label key={value} className={`flex cursor-pointer items-center gap-4 rounded-xl border px-4 py-3 ${level===value?'border-[var(--forest)] bg-[#fbf4f5]':'border-[var(--line)]'}`}><input type="radio" name="level" value={value} checked={level===value} onChange={()=>setLevel(value)} className="h-4 w-4 accent-[#7b2d3b]"/><span><strong className="block text-sm">{phase}</strong><span className="text-xs text-[var(--muted)]">{label}</span></span></label>)}</div></div>
+        {level==='Phase4'&&<div className="mt-5 rounded-2xl bg-[var(--mist)] p-4"><label htmlFor="phase4-class" className="text-sm font-bold">Phase IV enzyme class<select id="phase4-class" className="field mt-2" value={enzymeClass} onChange={event=>setEnzymeClass(event.target.value as EnzymeClass)}>{enzymeClassOptions.map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label><p className="mt-2 text-xs leading-5 text-[var(--muted)]">Automatic routes each sequence using its Phase III class. Select one class to restrict EC assignment to that class.</p></div>}
         <div className="mt-7 flex flex-col gap-4 border-t border-[var(--line)] pt-6 sm:flex-row sm:items-center sm:justify-between"><div className="min-h-[65px]">{!securityConfig.loaded?<div className="flex min-h-[65px] items-center gap-2 text-xs"><Loader2 className="h-4 w-4 animate-spin"/>Loading verification...</div>:securityConfig.error?<p className="text-xs text-[var(--danger)]">{securityConfig.error}</p>:securityConfig.required?<TurnstileWidget siteKey={securityConfig.siteKey} resetKey={resetKey} onToken={setTurnstile}/>:<span className="flex items-center gap-2 text-xs text-[var(--muted)]"><ShieldCheck className="h-4 w-4"/>Ready to submit. Results are retained for 30 days.</span>}</div><button type="button" disabled={busy||!securityConfig.loaded||Boolean(securityConfig.error)} onClick={submit} className="btn-primary min-w-48 px-6 py-3">{busy?<Loader2 className="h-4 w-4 animate-spin"/>:<Play className="h-4 w-4"/>}{busy?'Running...':'Start prediction'}</button></div>
       </div>
     </section>
