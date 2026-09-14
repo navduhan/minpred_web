@@ -81,7 +81,7 @@ async function cleanupExpiredJobs() {
 async function runJob(jobId: string, ownerHash: string) {
   activeJobs.set(jobId, ownerHash);
   try {
-    await updateRecord(jobId, { status: 'running', message: 'Submitted to the prediction executor.' });
+    await updateRecord(jobId, { status: 'running', message: 'Your prediction job is now being analyzed.' });
     const record = await readPredictionJob(jobId, false);
     const sequence = await fs.readFile(inputPath(jobId), 'utf8');
     const run = await executePrediction({ jobId, sequence, level: record.level, enzymeClass: record.enzymeClass, sequenceType:record.sequenceType||'prot' });

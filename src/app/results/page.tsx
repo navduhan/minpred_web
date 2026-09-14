@@ -40,7 +40,7 @@ export default function ResultsPage(){
     const timer = setInterval(() => void refresh(), 5000);
     return () => { cancelled = true; clearInterval(timer); };
   }, [bookmark]);
-  const files=useMemo(()=>Object.keys(data?.results||{}).sort((a,b)=>rank(a)-rank(b)),[data]);const rows=data?.results?.[active]||[];const columns=Object.keys(rows[0]||{});const expiry=data?.updatedAt?expiresAt(data.updatedAt):null;
+  const files=useMemo(()=>Object.keys(data?.results||{}).filter(file=>rank(file)<9).sort((a,b)=>rank(a)-rank(b)),[data]);const rows=data?.results?.[active]||[];const columns=Object.keys(rows[0]||{});const expiry=data?.updatedAt?expiresAt(data.updatedAt):null;
   async function openStructure(kind:'secondary'|'tertiary',sampleId:string){
     if(!bookmark||structureBusy)return;
     setStructureBusy(kind+':'+sampleId);setError('');

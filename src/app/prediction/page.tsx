@@ -163,19 +163,20 @@ export default function PredictionPage() {
 
   function clear() { setSequence(''); setAccessions(''); setFileName(''); setError(''); setReceipt(null); setLevel('Phase4'); setPhase4Mode('automatic'); setEnzymeClass('amidohydrolases'); }
 
-  function loadExample() {
+  function selectExample(value: 'mixed'|DemoSequenceKey) {
+    setSequenceExample(value);
     setSequenceType('prot');
     setMode('paste');
     setLevel('Phase4');
     setFileName('');
     setError('');
-    if (sequenceExample === 'mixed') {
+    if (value === 'mixed') {
       setSequence(mixedDemoSequence);
       setPhase4Mode('automatic');
       return;
     }
-    setSequence(demoSequences[sequenceExample].fasta);
-    setEnzymeClass(sequenceExample);
+    setSequence(demoSequences[value].fasta);
+    setEnzymeClass(value);
     setPhase4Mode('specific');
   }
 
@@ -191,7 +192,7 @@ export default function PredictionPage() {
     <section className="rounded-[2rem] border border-[var(--line)] bg-white shadow-[0_24px_70px_rgba(45,42,38,.08)]">
       <div className="border-b border-[var(--line)] p-6 sm:p-8"><div className="grid gap-6 sm:grid-cols-[1fr_1.5fr]"><div><p className="eyebrow">Step 1</p><h2 className="mt-1 font-display text-2xl font-semibold">Choose the input</h2></div><div className="grid gap-4 sm:grid-cols-2"><div><p className="text-sm font-bold">Sequence type</p><RoundedSelect ariaLabel="Sequence type" value={sequenceType} options={[["prot","Protein"],["nucl","Nucleotide"]]} onChange={value=>setSequenceType(value as 'prot'|'nucl')}/></div><fieldset><legend className="text-sm font-bold">Input method</legend><div className="mt-2 grid grid-cols-3 gap-1 rounded-xl bg-[var(--mist)] p-1">{(['paste','upload','accession'] as const).map(item=><button key={item} type="button" onClick={()=>{setMode(item);if(item==='accession')setSequenceType('prot');}} className={`rounded-lg px-2 py-3 text-xs font-bold capitalize ${mode===item?'bg-white text-[var(--forest)] shadow-sm':'text-[var(--muted)]'}`}>{item}</button>)}</div></fieldset></div></div>{sequenceType==='nucl'&&<p className="mt-4 rounded-xl bg-[var(--mineral-soft)] px-4 py-3 text-xs text-[var(--muted)]">TransDecoder.LongOrfs translates nucleotide records before MINpred analysis.</p>}</div>
       <div className="border-b border-[var(--line)] p-6 sm:p-8"><div className="flex flex-wrap items-end justify-between gap-4"><div><p className="eyebrow">Step 2</p><h2 className="mt-1 font-display text-2xl font-semibold">Add sequence data</h2></div><button type="button" onClick={clear} className="btn-secondary"><RotateCcw className="h-3.5 w-3.5"/>Clear</button></div>
-        {mode==='paste'&&<div className="mt-6 rounded-2xl border border-[var(--line)] bg-[#faf9f7] p-4"><div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end"><div><p className="text-sm font-bold">Example dataset</p><RoundedSelect ariaLabel="Example dataset" value={sequenceExample} options={demoSequenceOptions} onChange={value=>setSequenceExample(value as 'mixed'|DemoSequenceKey)}/></div><button type="button" onClick={loadExample} className="btn-secondary min-h-12">Load selected example</button></div><p className="mt-2 text-xs leading-5 text-[var(--muted)]">The mixed panel demonstrates automatic Phase IV routing. A class example selects that Phase IV class for you.</p></div>}
+        {mode==='paste'&&<div className="mt-6"><p className="text-sm font-bold">Use an example dataset</p><RoundedSelect ariaLabel="Example dataset" value={sequenceExample} options={demoSequenceOptions} onChange={value=>selectExample(value as 'mixed'|DemoSequenceKey)}/><p className="mt-2 text-xs leading-5 text-[var(--muted)]">Selection loads immediately. The mixed panel uses automatic Phase IV routing; a class example selects its matching Phase IV class.</p></div>}
         {mode==='accession'&&<div className="mt-6 rounded-2xl border border-[var(--line)] bg-[#faf9f7] p-4"><div className="grid gap-4 sm:grid-cols-[180px_1fr_auto] sm:items-start"><div><p className="text-sm font-bold">Protein database</p><RoundedSelect ariaLabel="Protein database" value={database} options={[["uniprot","UniProtKB"],["ncbi","NCBI Protein"]]} onChange={value=>setDatabase(value as 'uniprot'|'ncbi')}/></div><div><label htmlFor="protein-accessions" className="text-sm font-bold">Protein accession</label><input id="protein-accessions" className="field mt-2" value={accessions} onChange={(e)=>setAccessions(e.target.value)} placeholder="Enter one or more accessions"/><button type="button" onClick={useAccessionExample} className="mt-2 text-left text-xs font-semibold text-[var(--forest)] underline decoration-[var(--mineral)] underline-offset-4">Use example: {accessionExamples[database].label}</button></div><button type="button" onClick={fetchAccessions} className="btn-secondary mt-7 min-h-12"><Database className="h-4 w-4"/>Retrieve sequence</button></div><p className="mt-3 text-xs leading-5 text-[var(--muted)]">Accession retrieval accepts protein records only. Use spaces, commas, or new lines for multiple accessions.</p></div>}
         {mode==='upload'&&<label className="mt-6 flex min-h-28 cursor-pointer items-center justify-center gap-4 rounded-2xl border border-dashed border-[#b8b4ad] bg-[#faf9f7] px-5 text-center"><FileUp className="h-6 w-6 text-[var(--forest)]"/><span><b className="block text-sm">Choose a FASTA file</b><span className="text-xs text-[var(--muted)]">{fileName||'.fasta, .fa, .faa, or .txt'}</span></span><input className="sr-only" type="file" accept=".fasta,.fa,.faa,.txt" onChange={upload}/></label>}
         {mode!=='accession'&&<><textarea id="minpred-fasta" aria-label="FASTA sequence" rows={11} className="field mt-6 resize-y font-mono text-xs leading-6" value={sequence} onChange={(e)=>setSequence(e.target.value)} placeholder=">protein_id&#10;MSEQUENCE..."/><p className="mt-2 text-xs text-[var(--muted)]">{count?`${count} record${count===1?'':'s'} detected`:sequenceType==='nucl'?'Accepted symbols: A, C, G, T, U, and N.':'Standard amino acids and X are accepted.'}</p></>}</div>
