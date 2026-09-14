@@ -1,0 +1,44 @@
+# Node dependencies
+node_modules/
+npm-debug.log*
+.next/
+/deploy/data/
+/public/download/
+
+# React Build output
+frontend/build/
+
+# Backend temporary files
+backend/src/prediction/tmp/*
+!backend/src/prediction/tmp/.gitkeep
+
+# Environment variables
+.env
+/deploy/docker.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Python caches and S4PRED weights (downloaded and checksum-verified at build time)
+__pycache__/
+*.py[cod]
+s4pred/weights/
+s4pred/weights.tar.gz
+
+# Generated documentation, environments, and obsolete root-level Python lock metadata
+**/docs/_build/
+**/.venv/
+/pyproject.toml
+/uv.lock
+
+# OS Files
+.DS_Store
+Thumbs.db
+*:Zone.Identifier
+
+# Generated outputs from the embedded MINpred CLI
+backend/minpred/
+backend/minpred/minpred_results/
+backend/minpred/test_*_output/
+backend/minpred/example/test_*/

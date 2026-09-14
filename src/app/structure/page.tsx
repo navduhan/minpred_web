@@ -1,0 +1,15 @@
+'use client';
+import { useCallback,useEffect,useState } from 'react';
+import dynamic from 'next/dynamic';
+import SecondaryStructureViewer from '@/components/SecondaryStructureViewer';
+import {withBasePath} from '@/lib/base-path';
+type Structure={sampleId:string;sequence:string;amino_acids:string;prediction:string;confidence:string;pdb:string;method:string};
+const Viewer=dynamic(()=>import('@/components/StructureViewer'),{ssr:false});
+export default function StructurePage(){
+  const [data,setData]=useState<Structure|null>(null),[error,setError]=useState(''),[busy,setBusy]=useState(false),[info,setInfo]=useState({job:'',token:'',sample:'',kind:'secondary',phase:''});
+  useEffect(()=>{const p=new URLSearchParams(window.location.hash.slice(1));void Promise.resolve().then(()=>setInfo({job:p.get('job')||'',token:p.get('token')||'',sample:p.get('sample')||'',kind:p.get('kind')==='tertiary'?'tertiary':'secondary',phase:p.get('phase')||''}));},[]);
+  const load=useCallback(async()=>{setBusy(true);setError('');try{const r=await fetch(withBasePath('/api/structure/'+info.kind),{method:'POST',headers:{'Content-Type':'application/json','X-MINpred-Job-Token':info.token},body:JSON.stringify({jobId:info.job,sampleId:info.sample})});const value=await r.json();if(!r.ok)throw new Error(value.error||'Structure unavailable.');setData(value);}catch(e){setError(e instanceof Error?e.message:'Structure unavailable.');}finally{setBusy(false);}},[info]);
+  useEffect(()=>{if(!info.job)return;let cancelled=false;void Promise.resolve().then(()=>{if(cancelled)return;try{const saved=JSON.parse(sessionStorage.getItem('minpred_structure_view')||'null');if(saved?.job===info.job&&saved?.sample===info.sample&&saved?.kind===info.kind){setData(saved.data);return;}}catch{/* Fall back to the server cache. */}void load();});return()=>{cancelled=true;};},[info,load]);
+  const back=withBasePath('/results')+'#'+new URLSearchParams({job:info.job,token:info.token,phase:info.phase});
+  return <main className="space-y-5 py-8"><a href={back} className="btn-secondary">← Back to results table</a><h1 className="text-3xl font-semibold">{info.kind==='secondary'?'Secondary structure':'3D structure'}</h1><p className="break-all">{info.sample}</p>{!data&&!error&&<p role="status">Loading structure…</p>}{error&&<button className="btn-secondary" disabled={busy||!info.job} onClick={()=>void load()}>Retry loading</button>}{error&&<p role="alert" className="text-[var(--danger)]">{error}</p>}{data&&(info.kind==='secondary'?<><button className="btn-secondary" onClick={()=>{const a=document.createElement('a');const url=URL.createObjectURL(new Blob([`>${data.sampleId}\nAA: ${data.amino_acids}\nPred: ${data.prediction}\nConf: ${data.confidence}\n`],{type:'text/plain'}));a.href=url;a.download='secondary-structure.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}}>Download prediction</button><SecondaryStructureViewer data={data}/></>:<><p>{data.method}</p><Viewer pdb={data.pdb} sequence={data.sequence} sampleId={data.sampleId}/></>)}</main>;
+}

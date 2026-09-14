@@ -1,0 +1,13 @@
+.git
+.github
+.next
+node_modules
+frontend
+backend
+s4pred
+deploy/data
+public/download
+.env*
+npm-debug.log*
+Dockerfile*
+README.md
