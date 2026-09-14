@@ -13,9 +13,9 @@ services:
     user: "${DOCKER_UID:-1000}:${DOCKER_GID:-1000}"
     restart: unless-stopped
     expose:
-      - "3365"
+      - "3375"
     environment:
-      PORT: "3365"
+      PORT: "3375"
       HOSTNAME: "0.0.0.0"
       NEXT_PUBLIC_BASE_PATH: ${NEXT_PUBLIC_BASE_PATH:-/minpred}
       BIOCLUSTER_HOST: ${BIOCLUSTER_HOST:?set BIOCLUSTER_HOST}
@@ -66,7 +66,7 @@ services:
       - egress
     mem_limit: 1g
     healthcheck:
-      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3365/minpred').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3375/minpred').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -79,7 +79,7 @@ services:
     depends_on:
       - app
     ports:
-      - "${PUBLIC_BIND_ADDRESS:-127.0.0.1}:3365:3365"
+      - "${PUBLIC_BIND_ADDRESS:-127.0.0.1}:3375:3375"
     environment:
       NGINX_ENVSUBST_FILTER: TRUSTED_PROXY_CIDR
       TRUSTED_PROXY_CIDR: ${TRUSTED_PROXY_CIDR:?set TRUSTED_PROXY_CIDR}
@@ -99,7 +99,7 @@ services:
       - frontend
       - egress
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:3365/minpred"]
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:3375/minpred"]
       interval: 30s
       timeout: 5s
       retries: 3

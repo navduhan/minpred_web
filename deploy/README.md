@@ -1,6 +1,6 @@
 # MINpred VM deployment
 
-This deployment runs the Next.js application behind an unprivileged Nginx gateway on VM loopback port 3365. Prediction inputs are transferred over pinned-key SSH/SFTP to the configured cluster, submitted with `sbatch --parsable --wait`, and the allow-listed TSV result files are retrieved over SFTP.
+This deployment runs the Next.js application behind an unprivileged Nginx gateway on VM loopback port 3375. Prediction inputs are transferred over pinned-key SSH/SFTP to the configured cluster, submitted with `sbatch --parsable --wait`, and the allow-listed TSV result files are retrieved over SFTP.
 
 ## VM preparation
 
@@ -56,7 +56,7 @@ The rootless check must print `true`. The Podman overlay uses `keep-id` for the 
 docker compose --env-file deploy/docker.env -f deploy/compose.yaml -f deploy/compose.ssh-key.yaml up -d --build
 ```
 
-The gateway listens only on `127.0.0.1:3365` by default. When the HTTPS reverse proxy is on another host, set `PUBLIC_BIND_ADDRESS` to the VM's private interface address and set `TRUSTED_PROXY_CIDR` to the reverse proxy's exact source address with a `/32` prefix. Restrict TCP port 3365 at the VM firewall to that same source address. Never expose the internal application container.
+The gateway listens only on `127.0.0.1:3375` by default. When the HTTPS reverse proxy is on another host, set `PUBLIC_BIND_ADDRESS` to the VM's private interface address and set `TRUSTED_PROXY_CIDR` to the reverse proxy's exact source address with a `/32` prefix. Restrict TCP port 3375 at the VM firewall to that same source address. Never expose the internal application container.
 
 ### Apache HTTPS reverse proxy
 
@@ -68,11 +68,11 @@ ProxyPreserveHost On
 RequestHeader set X-Forwarded-Proto "https"
 RequestHeader set X-Forwarded-Port "443"
 
-ProxyPass        /minpred http://MINPRED_PRIVATE_HOST:3365/minpred connectiontimeout=5 timeout=720
-ProxyPassReverse /minpred http://MINPRED_PRIVATE_HOST:3365/minpred
+ProxyPass        /minpred http://MINPRED_PRIVATE_HOST:3375/minpred connectiontimeout=5 timeout=720
+ProxyPassReverse /minpred http://MINPRED_PRIVATE_HOST:3375/minpred
 ```
 
-On the MINpred host, use its private interface for `PUBLIC_BIND_ADDRESS` and use the Apache host's private source address with a `/32` prefix for `TRUSTED_PROXY_CIDR`. Permit port 3365 only from that Apache source address. Then validate and reload Apache:
+On the MINpred host, use its private interface for `PUBLIC_BIND_ADDRESS` and use the Apache host's private source address with a `/32` prefix for `TRUSTED_PROXY_CIDR`. Permit port 3375 only from that Apache source address. Then validate and reload Apache:
 
 ```bash
 sudo apachectl configtest
@@ -84,7 +84,7 @@ Check the deployment:
 ```bash
 podman compose --env-file deploy/docker.env -f deploy/compose.yaml -f deploy/compose.podman.yaml ps
 podman compose --env-file deploy/docker.env -f deploy/compose.yaml -f deploy/compose.podman.yaml logs -f app gateway
-curl --fail http://127.0.0.1:3365/minpred
+curl --fail http://127.0.0.1:3375/minpred
 ```
 
 ## Results retention

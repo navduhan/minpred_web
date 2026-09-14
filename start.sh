@@ -215,7 +215,7 @@ check_health() {
     base_path="${base_path:-/minpred}"
     health_host="${bind_address}"
     [[ "${health_host}" == 0.0.0.0 || "${health_host}" == :: ]] && health_host=127.0.0.1
-    health_url="http://${health_host}:3365${base_path}"
+    health_url="http://${health_host}:3375${base_path}"
     printf 'Waiting for %s ...\n' "${health_url}"
     for attempt in {1..30}; do
         if curl --fail --silent --show-error --max-time 5 "${health_url}" >/dev/null 2>&1; then

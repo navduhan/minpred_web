@@ -34,7 +34,7 @@ RUN bash /tmp/package-standalone.sh /opt/minpred-downloads
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV PORT=3365
+ENV PORT=3375
 ENV HOSTNAME=0.0.0.0
 ENV S4PRED_SCRIPT=/opt/s4pred/run_model.py
 ENV S4PRED_PYTHON=/opt/s4pred-venv/bin/python
@@ -47,6 +47,6 @@ RUN mkdir -p /app/public/download /app/data/jobs \
     && chown -R nextjs:nodejs /app/data
 
 USER nextjs
-EXPOSE 3365
+EXPOSE 3375
 ENTRYPOINT ["/usr/bin/tini", "--"]
 CMD ["node", "server.js"]
