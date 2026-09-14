@@ -9,7 +9,7 @@ The web service does not run prediction locally. It transfers validated input
 over pinned-key SSH, submits `deploy/hpc/run_minpred_web.slurm` with
 `sbatch --parsable --wait`, retrieves allow-listed result tables, and removes
 the remote working directory after a successful transfer. The HPC wrapper runs
-the maintained standalone MINpred CLI in the `deepml` Conda environment.
+the maintained standalone MINpred CLI through the cluster's `dl-gpu` module.
 
 ## Pages and features
 

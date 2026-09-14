@@ -23,7 +23,7 @@ chmod 0600 /absolute/path/to/dedicated-private-key
 
 `ssh-keyscan` discovers a key but does not establish trust by itself. Password authentication is not supported by this deployment.
 
-Install the maintained standalone MINpred repository at `$HOME/naveen_tools/minpred`, or set `MINPRED_APP_DIR` to its absolute path. Install `deploy/hpc/run_minpred_web.slurm` on the cluster and set `BIOCLUSTER_REMOTE_SCRIPT` to its absolute path. The wrapper accepts `input.fasta level enzyme-class output-directory sequence-type`; use `all` for automatic Phase III-to-Phase IV routing. It runs the standalone CLI in the `deepml` Conda environment by default and writes web-readable TSV copies of the CLI phase logs. Set `MINPRED_CONDA_ENV`, `MINPRED_CONDA_EXE`, or `MINPRED_MODEL_DIR` when the cluster layout differs. A nonzero predictor exit is returned to the web job unchanged.
+Install the maintained standalone MINpred repository at `$HOME/naveen_tools/minpred`, or set `MINPRED_APP_DIR` to its absolute path. The standalone checkout supplies `minpred.sl` and `run_minpred_web.slurm`; set `BIOCLUSTER_REMOTE_SCRIPT` to the latter. The wrapper accepts `input.fasta level enzyme-class output-directory sequence-type`, uses `all` for automatic Phase III-to-Phase IV routing, loads the cluster's `dl-gpu` module, and delegates to `minpred.sl`. A checkout-local virtual environment created with `--system-site-packages` supplies only lightweight dependencies absent from the module while retaining its TensorFlow runtime. The launcher also exposes the TransDecoder installation bundled under the module prefix. Set `MINPRED_MODULE` or `MINPRED_MODEL_DIR` when the cluster layout differs. A nonzero predictor exit is returned to the web job unchanged.
 
 ## Start
 
@@ -105,8 +105,8 @@ The application image installs the pinned S4PRED source and verified model weigh
 
 ## Prediction execution policy
 
-Prediction is cluster-only. The application has no local inference path and reports a clear job failure when SSH, SLURM, the `deepml` environment, the standalone checkout, or required TFLite models are unavailable.
+Prediction is cluster-only. The application has no local inference path and reports a clear job failure when SSH, SLURM, the `dl-gpu` module, the standalone checkout, or required TFLite models are unavailable.
 
 The image build packages the standalone revision pinned in `deploy/package-standalone.sh` into `/download/minpred-standalone.tar.gz`, with `SHA256SUMS` and `REVISION.txt`. Do not mount an empty host folder over `/app/public/download`: it would hide the packaged files.
 
-The web job launcher accepts `protein` or `nucleotide` as its fifth argument. Nucleotide jobs require `TransDecoder.LongOrfs` in the `deepml` environment. They retain `translated_proteins.fasta` in the private job directory so structure requests use the translated protein identifiers and sequences. Protein and nucleotide usage examples are on the Help page.
+The web job launcher accepts `protein` or `nucleotide` as its fifth argument. Nucleotide jobs use `TransDecoder.LongOrfs` from the `dl-gpu` module and retain `translated_proteins.fasta` in the private job directory so structure requests use the translated protein identifiers and sequences. Protein and nucleotide usage examples are on the Help page.
