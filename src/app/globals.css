@@ -25,6 +25,8 @@
 }
 
 .font-display { font-family: inherit; letter-spacing: -.015em; }
+.results-page { font-family: "Avenir Next", Avenir, "Helvetica Neue", sans-serif; }
+.results-title { font-family: Charter, "Iowan Old Style", "Palatino Linotype", Georgia, serif; letter-spacing: -.025em; }
 .nav-link { display: inline-flex; align-items: center; gap: .38rem; border-bottom: 2px solid transparent; padding: .65rem .3rem .55rem; color: #697174; font-size: .78rem; font-weight: 700; transition: color .18s ease, border-color .18s ease; }
 .nav-link:hover { background: var(--mist); color: var(--forest); }
 .nav-link-active { border-color: var(--mineral); background: transparent; color: var(--forest-dark); }

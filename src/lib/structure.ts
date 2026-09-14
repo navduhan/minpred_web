@@ -75,7 +75,11 @@ async function swissModel(sequence: string) {
     if (status.status === 'COMPLETED') {
       const url = status.models?.[0]?.coordinates_url;
       if (!url) throw new Error('SWISS-MODEL completed without coordinates.');
-      const coordinates = await fetch(url, { signal: AbortSignal.timeout(60_000), cache: 'no-store' });
+      const coordinatesUrl = new URL(url, 'https://swissmodel.expasy.org');
+      if (coordinatesUrl.protocol !== 'https:' || (coordinatesUrl.hostname !== 'swissmodel.expasy.org' && !coordinatesUrl.hostname.endsWith('.expasy.org'))) {
+        throw new Error('SWISS-MODEL returned an unexpected coordinate location.');
+      }
+      const coordinates = await fetch(coordinatesUrl, { signal: AbortSignal.timeout(60_000), cache: 'no-store' });
       if (!coordinates.ok) throw new Error(`SWISS-MODEL coordinates returned HTTP ${coordinates.status}.`);
       const buffer = Buffer.from(await coordinates.arrayBuffer());
       try { return (await gunzip(buffer)).toString('utf8'); } catch { return buffer.toString('utf8'); }
