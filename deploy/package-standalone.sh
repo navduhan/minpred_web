@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-revision=abffee8efd6e42870ceb2a566a7bbed348d99fd4
+revision=35a508cb38451c6c964d4a27eee87745b4e4d70c
 destination=${1:-/opt/minpred-downloads}
 work=$(mktemp -d)
 trap 'rm -rf -- "$work"' EXIT
