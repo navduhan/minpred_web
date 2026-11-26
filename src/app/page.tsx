@@ -4,16 +4,16 @@ import { ArrowRight, Database, Dna, LockKeyhole, ScanSearch } from 'lucide-react
 import mineralizationHero from '../../public/minpred-mineralization-hero.png';
 
 const stages = [
-  ['I', 'Enzyme screen', 'Enzyme or non-enzyme', 'DPC + NMBroto'],
-  ['II', 'Mineralization screen', 'Nitrogen mineralization or other enzyme', 'DPC + NMBroto'],
-  ['III', 'Enzyme family', 'One of ten mineralization-related classes', 'DPC + NMBroto'],
-  ['IV', 'EC assignment', 'Class-specific Enzyme Commission label', 'CKSAAP'],
+  ['I', 'Enzyme screen', 'Enzyme or non-enzyme', 'ESM-2 (650M) · MLP'],
+  ['II', 'Mineralization screen', 'Nitrogen mineralization or other enzyme', 'ESM-2 (650M) · MLP'],
+  ['III', 'Enzyme family', 'One of ten mineralization-related classes', 'ESM-2 (650M) · MLP'],
+  ['IV', 'EC assignment', 'Class-specific 4-digit EC label', 'ESM-2 (650M) · MLP'],
 ];
 
 export default function Home() {
   return <div className="pb-16">
     <section className="reveal grid min-h-[620px] items-center gap-10 border-b border-[var(--line)] py-16 sm:py-20 lg:grid-cols-[.92fr_1.08fr] lg:py-24">
-      <div><p className="eyebrow">Sequence-based nitrogen mineralization annotation</p><h1 className="mt-6 max-w-3xl font-display text-5xl font-semibold leading-[1.02] text-[var(--forest-dark)] sm:text-6xl lg:text-7xl">Predict enzymes involved in nitrogen mineralization.</h1><p className="mt-7 max-w-2xl text-lg leading-8 text-[var(--muted)]">MINpred screens protein and nucleotide sequences, identifies mineralization-related enzyme classes, and assigns class-specific EC labels through a four-phase workflow.</p><div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 border-y border-[var(--line)] py-4 text-xs font-semibold text-[var(--forest)]"><span>10 enzyme classes</span><span>69 named EC labels</span><span>Protein and nucleotide input</span></div><div className="mt-9 flex flex-wrap gap-3"><Link href="/prediction" className="btn-primary">Start prediction <ArrowRight className="h-4 w-4"/></Link><Link href="/help" className="btn-secondary">Methods and EC reference</Link></div></div>
+      <div><p className="eyebrow">Alignment-free nitrogen mineralization annotation</p><h1 className="mt-6 max-w-3xl font-display text-5xl font-semibold leading-[1.02] text-[var(--forest-dark)] sm:text-6xl lg:text-7xl">Predict enzymes involved in nitrogen mineralization.</h1><p className="mt-7 max-w-2xl text-lg leading-8 text-[var(--muted)]">MINpred embeds protein and translated nucleotide sequences once with ESM-2 (650M), identifies mineralization-related enzyme classes, and assigns class-specific four-digit EC labels through a four-phase cascade.</p><div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 border-y border-[var(--line)] py-4 text-xs font-semibold text-[var(--forest)]"><span>10 enzyme classes</span><span>52 explicit 4-digit EC labels</span><span>Protein and nucleotide input</span></div><div className="mt-9 flex flex-wrap gap-3"><Link href="/prediction" className="btn-primary">Start prediction <ArrowRight className="h-4 w-4"/></Link><Link href="/help" className="btn-secondary">Methods and EC reference</Link></div></div>
       <figure className="relative"><div className="absolute inset-x-[12%] bottom-[8%] top-[10%] rounded-full bg-[#ebe8df] blur-3xl"/><Image src={mineralizationHero} alt="Protein sequence and enzyme structures connected to nitrogen mineralization in soil" className="relative h-auto w-full object-contain" priority/><figcaption className="relative mt-2 text-right text-[10px] uppercase tracking-[.16em] text-[var(--muted)]">Sequence · enzyme class · EC assignment</figcaption></figure>
     </section>
 

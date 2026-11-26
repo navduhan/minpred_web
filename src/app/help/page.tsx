@@ -18,16 +18,16 @@ const phases = [
 ] as const;
 
 const enzymeClasses = [
-  { abbreviation: 'AH', name: 'Amidohydrolases', description: 'Hydrolyze non-peptide carbon–nitrogen bonds, including linear amides.', ec: ['3.5.1.1','3.5.1.2','3.5.1.4','3.5.1.5','3.5.1.11','3.5.1.28','3.5.1.68'] },
-  { abbreviation: 'AP', name: 'Aminopeptidases', description: 'Remove amino-acid residues from the amino terminus of peptides or proteins.', ec: ['3.4.11.-','3.4.11.1','3.4.11.2','3.4.11.4','3.4.11.5','3.4.11.6','3.4.11.9','3.4.11.10','3.4.11.18','3.4.11.19','3.4.11.24','Others'] },
-  { abbreviation: 'AEP', name: 'Aspartic endopeptidases', description: 'Hydrolyze internal peptide bonds through an aspartate-dependent catalytic mechanism.', ec: ['3.4.23.-','3.4.23.12','3.4.23.21','3.4.23.24','3.4.23.36','3.4.23.43','3.4.23.51','Others'] },
-  { abbreviation: 'CEP', name: 'Cysteine endopeptidases', description: 'Use a catalytic cysteine to hydrolyze internal peptide bonds.', ec: ['3.4.22.-','3.4.22.8','3.4.22.10','3.4.22.37','3.4.22.40','3.4.22.49','3.4.22.68','3.4.22.70','3.4.22.71','Others'] },
-  { abbreviation: 'DP', name: 'Dipeptidases', description: 'Hydrolyze dipeptides into their component amino acids.', ec: ['3.4.13.-','3.4.13.9','3.4.13.19','3.4.13.20','3.4.13.21','3.4.13.22','Others'] },
-  { abbreviation: 'DPP', name: 'Dipeptidyl-peptidases', description: 'Release a dipeptide from the amino terminus of a peptide or protein.', ec: ['3.4.14.-','3.4.14.1','3.4.14.5','3.4.14.10','3.4.14.11','3.4.14.12','Others'] },
-  { abbreviation: 'MEP', name: 'Metalloendopeptidases', description: 'Use a metal ion to catalyze hydrolysis of internal peptide bonds.', ec: ['3.4.24.-','3.4.24.3','3.4.24.13','3.4.24.39','3.4.24.40','3.4.24.55','3.4.24.64','3.4.24.75','3.4.24.84','Others'] },
-  { abbreviation: 'MP', name: 'Metallopeptidases', description: 'Metal-dependent exopeptidases represented by the EC 3.4.17 group.', ec: ['3.4.17.-','3.4.17.11','3.4.17.13','3.4.17.14','3.4.17.18','3.4.17.19','3.4.17.21','3.4.17.24','Others'] },
-  { abbreviation: 'OP', name: 'Omega peptidases', description: 'Hydrolyze specialized terminal or isopeptide linkages in the EC 3.4.19 group.', ec: ['3.4.19.-','3.4.19.1','3.4.19.2','3.4.19.9','3.4.19.11','3.4.19.12','Others'] },
-  { abbreviation: 'SEP', name: 'Serine endopeptidases', description: 'Use a catalytic serine to hydrolyze internal peptide bonds.', ec: ['3.4.21.-','3.4.21.53','3.4.21.62','3.4.21.88','3.4.21.89','3.4.21.92','3.4.21.102','3.4.21.105','3.4.21.107','Others'] },
+  { abbreviation: 'AH', name: 'Amidohydrolases', description: 'Hydrolyze non-peptide carbon–nitrogen bonds, including urea and linear amides.', ec: ['3.5.1.1','3.5.1.2','3.5.1.4','3.5.1.5','3.5.1.11','3.5.1.28','Others'] },
+  { abbreviation: 'AP', name: 'Aminopeptidases', description: 'Remove amino-acid residues from the amino terminus of peptides or proteins.', ec: ['3.4.11.2','3.4.11.4','3.4.11.5','3.4.11.9','3.4.11.18','3.4.11.21','Others'] },
+  { abbreviation: 'AEP', name: 'Aspartic endopeptidases', description: 'Hydrolyze internal peptide bonds through an aspartate-dependent catalytic mechanism.', ec: ['3.4.23.24','3.4.23.36','3.4.23.43','Others'] },
+  { abbreviation: 'CEP', name: 'Cysteine endopeptidases', description: 'Use a catalytic cysteine to hydrolyze internal peptide bonds.', ec: ['3.4.22.15','3.4.22.28','3.4.22.50','3.4.22.66','Others'] },
+  { abbreviation: 'DP', name: 'Dipeptidases', description: 'Hydrolyze dipeptides into their component amino acids.', ec: ['3.4.13.9','3.4.13.19','3.4.13.21','Others'] },
+  { abbreviation: 'DPP', name: 'Dipeptidyl-peptidases', description: 'Release a dipeptide from the amino terminus of a peptide or protein.', ec: ['3.4.14.4','3.4.14.5','3.4.14.10','3.4.14.11','Others'] },
+  { abbreviation: 'MEP', name: 'Metalloendopeptidases', description: 'Use a metal ion to catalyze hydrolysis of internal peptide bonds.', ec: ['3.4.24.3','3.4.24.11','3.4.24.28','3.4.24.39','3.4.24.59','3.4.24.64','3.4.24.69','3.4.24.84','Others'] },
+  { abbreviation: 'MP', name: 'Metallopeptidases', description: 'Metal-dependent metallocarboxypeptidases represented by the EC 3.4.17 group.', ec: ['3.4.17.21','Others'] },
+  { abbreviation: 'OP', name: 'Omega peptidases', description: 'Hydrolyze specialized terminal or isopeptide linkages in the EC 3.4.19 group.', ec: ['3.4.19.3','3.4.19.12','3.4.19.13','Others'] },
+  { abbreviation: 'SEP', name: 'Serine endopeptidases', description: 'Use a catalytic serine to hydrolyze internal peptide bonds.', ec: ['3.4.21.1','3.4.21.4','3.4.21.26','3.4.21.53','3.4.21.62','3.4.21.88','3.4.21.89','3.4.21.90','3.4.21.91','3.4.21.92','3.4.21.97','3.4.21.102','3.4.21.105','3.4.21.107','Others'] },
 ] as const;
 
 function Section({id, number, title, children}:{id:string; number:string; title:string; children:ReactNode}) {
@@ -70,9 +70,9 @@ export default function Help() {
         </Section>
 
         <Section id="classes" number="05" title="Ten classes and their EC outputs">
-          <p>Phase III selects one enzyme class. Phase IV predicts among the EC labels provided by that class-specific model. MINpred covers 69 specific EC numbers plus wildcard and <code>Others</code> outputs; it is not a predictor for every EC number.</p>
+          <p>Phase III selects one enzyme class. Phase IV predicts among the four-digit EC labels provided by that class-specific model. MINpred covers 52 explicit four-digit EC numbers plus class-conditional <code>Others</code> outputs; incomplete three-digit wildcard entries (such as <code>3.4.x.-</code>) are excluded, and MINpred is not a predictor for every EC number outside nitrogen mineralization.</p>
           <div className="divide-y divide-[var(--line)] border-y border-[var(--line)]">{enzymeClasses.map(group=><article key={group.name} className="grid gap-4 py-5 xl:grid-cols-[3rem_215px_1fr]"><span className="font-black text-[var(--mineral)]">{group.abbreviation}</span><div><h3 className="font-bold text-[var(--forest-dark)]">{group.name}</h3><p className="mt-1 text-xs leading-5">{group.description}</p></div><div className="flex flex-wrap content-start gap-1.5">{group.ec.map(label=><code key={label} className={`rounded-lg border px-2 py-1 text-[11px] ${label==='Others'?'border-dashed border-[#b9b5ab] text-[var(--muted)]':'border-[var(--line)] bg-[var(--canvas)] text-[var(--forest-dark)]'}`}>{label}</code>)}</div></article>)}</div>
-          <div className="rounded-xl bg-[var(--mist)] p-5 text-sm"><p><strong className="text-[var(--forest-dark)]">Reading an EC label:</strong> the positions describe progressively narrower enzyme categories. For example, <code>3.4.11.1</code> falls within hydrolases (3), peptide-bond hydrolases (3.4), and aminopeptidases (3.4.11).</p><p className="mt-2"><code>3.4.11.-</code> represents the broader subgroup without a specific fourth-level assignment. <code>Others</code> groups represented records outside the named labels. Confirm current nomenclature in the <a className="font-semibold underline underline-offset-4" href="https://www.enzyme-database.org/" target="_blank" rel="noreferrer">IUBMB Enzyme Nomenclature database</a>.</p></div>
+          <div className="rounded-xl bg-[var(--mist)] p-5 text-sm"><p><strong className="text-[var(--forest-dark)]">Reading an EC label:</strong> the four positions describe progressively narrower catalytic categories. For example, <code>3.4.11.2</code> falls within hydrolases (3), peptide-bond hydrolases (3.4), aminopeptidases (3.4.11), and membrane alanyl aminopeptidase (3.4.11.2).</p><p className="mt-2"><code>Others</code> captures curated class members belonging to rarer four-digit EC numbers below the per-EC cluster-count threshold. Confirm current nomenclature in the <a className="font-semibold underline underline-offset-4" href="https://www.enzyme-database.org/" target="_blank" rel="noreferrer">IUBMB Enzyme Nomenclature database</a>.</p></div>
         </Section>
 
         <Section id="results" number="06" title="Reading and downloading results">
@@ -89,14 +89,14 @@ export default function Help() {
         </Section>
 
         <Section id="standalone" number="09" title="Standalone usage">
-          <p>The command-line tool uses the same four-phase hierarchy and supports automatic or class-restricted Phase IV analysis.</p><Code>{`# Protein FASTA, automatic routing through Phase IV
-minpred -i proteins.fasta -od results -l Phase4
+          <p>The command-line tool uses the same four-phase ESM-2 (650M) + MLP hierarchy, ships with all 13 Keras (<code>.keras</code>) models and <code>.npz</code> StandardScalers bundled inside the package, and supports automatic or class-restricted Phase IV analysis.</p><Code>{`# Protein FASTA, automatic routing through Phase IV
+minpred -i proteins.fasta -o results
 
 # Restrict Phase IV to one class
-minpred -i proteins.fasta -od results -l Phase4 -n serine
+minpred -i proteins.fasta -o results -p 4 -c serine
 
 # Nucleotide or transcript FASTA through TransDecoder
-minpred -i transcripts.fasta --sequence-type nucleotide -od results -l Phase4`}</Code><p>Run <code>minpred download-models all</code> to retrieve all model files in advance and <code>minpred models-status</code> to verify them. TransDecoder is an external dependency for nucleotide input.</p>
+minpred -i transcripts.fasta -o results -t nucleotide`}</Code><p>Run <code>minpred models-status</code> to verify SHA-256 checksums of all bundled model files. On first run, PyTorch/Transformers caches <code>facebook/esm2_t33_650M_UR50D</code> locally. TransDecoder is an external dependency for nucleotide input.</p>
         </Section>
 
         <Section id="troubleshooting" number="10" title="Troubleshooting">
@@ -120,7 +120,7 @@ minpred -i transcripts.fasta --sequence-type nucleotide -od results -l Phase4`}<
 
         <Section id="citation" number="13" title="Citation, reproducibility, and support">
           <p>When reporting an analysis, record MINpred version 1.0.0, the webserver URL and access date, input type, selected phase, Phase IV routing choice, and the downloaded result tables. For standalone work, also record the software revision and model status.</p>
-          <blockquote className="border-l-2 border-[var(--mineral)] pl-5 text-[var(--forest-dark)]">Duhan, N., Norton, J. M., &amp; Kaundal, R. (2026). <em>MINpred: TFLite models for nitrogen mineralization-related enzyme classification</em> (Version 1.0.0). Zenodo. <a className="underline underline-offset-4" href="https://doi.org/10.5281/zenodo.21897103" target="_blank" rel="noreferrer">https://doi.org/10.5281/zenodo.21897103</a></blockquote>
+          <blockquote className="border-l-2 border-[var(--mineral)] pl-5 text-[var(--forest-dark)]">Duhan, N., Norton, J. M., &amp; Kaundal, R. (2026). <em>MINpred: A Hierarchical Protein Language Model Framework for Predicting Nitrogen-Mineralization Enzymes</em> (Version 1.0.0). Available at <a className="underline underline-offset-4" href="https://kaabil.net/minpred" target="_blank" rel="noreferrer">https://kaabil.net/minpred</a> and <a className="underline underline-offset-4" href="https://github.com/usubioinfo/minpred" target="_blank" rel="noreferrer">https://github.com/usubioinfo/minpred</a>.</blockquote>
           <div className="flex gap-3 rounded-xl bg-[var(--mist)] p-4"><CheckCircle2 className="mt-1 h-5 w-5 shrink-0 text-[var(--forest)]"/><p>For assistance, contact <a className="font-semibold underline underline-offset-4" href="mailto:naveen.duhan@usu.edu">Naveen Duhan</a>. Report software issues through the <a className="font-semibold underline underline-offset-4" href="https://github.com/usubioinfo/minpred_web/issues" target="_blank" rel="noreferrer">webserver issue tracker</a> or <a className="font-semibold underline underline-offset-4" href="https://github.com/usubioinfo/minpred/issues" target="_blank" rel="noreferrer">standalone issue tracker</a>. Do not include private tokens, credentials, or confidential sequences.</p></div>
         </Section>
       </main>

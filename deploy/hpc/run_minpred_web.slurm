@@ -2,6 +2,7 @@
 #SBATCH --job-name=minpred-web
 #SBATCH --partition=mahaguru
 #SBATCH --nodelist=chela-g01
+#SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=6
 #SBATCH --mem=48G
 #SBATCH --time=12:00:00
@@ -19,7 +20,6 @@ fi
 
 export MINPRED_APP_DIR="$app_dir"
 export MINPRED_MODULE="${MINPRED_MODULE:-dl-gpu}"
-export MINPRED_MODEL_DIR="${MINPRED_MODEL_DIR:-$app_dir/models}"
 export TF_FORCE_GPU_ALLOW_GROWTH=true
 export TF_CPP_MIN_LOG_LEVEL=2
 

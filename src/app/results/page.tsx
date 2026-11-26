@@ -16,7 +16,7 @@ const layoutPreview: Result = {
     'Phase_1_dnn_log.tsv': [{ SampleID: 'minpred_example_1', Prediction: 'Enzyme', Enzyme: 99.4, 'Non-enzyme': 0.6 }],
     'Phase_2_dnn_log.tsv': [{ SampleID: 'minpred_example_1', Prediction: 'Nitrogen Mineralization', 'Nitrogen Mineralization': 97.8, 'Non-nitrogen Mineralization': 2.2 }],
     'Phase_3_dnn_log.tsv': [{ SampleID: 'minpred_example_1', Prediction: 'Serine endopeptidases', Amidohydrolases: 0.4, Aminopeptidases: 0.8, 'Aspartic endopeptidases': 0.6, 'Cysteine endopeptidases': 0.9, Dipeptidases: 0.5, 'Dipeptidyl-peptidases': 0.7, Metalloendopeptidases: 0.8, Metallopeptidases: 0.9, 'Omega peptidases': 0.8, 'Serine endopeptidases': 93.6 }],
-    'Phase_4_serine_log.tsv': [{ SampleID: 'minpred_example_1', Enzyme_Class: 'Serine endopeptidases', Prediction: '3.4.21.53', '3.4.21.-': 0.8, '3.4.21.53': 91.2, '3.4.21.62': 1.4, '3.4.21.88': 0.9, '3.4.21.89': 0.7, '3.4.21.92': 1.1, '3.4.21.102': 0.8, '3.4.21.105': 0.9, '3.4.21.107': 0.6, Others: 1.6 }],
+    'Phase_4_serine_log.tsv': [{ SampleID: 'minpred_example_1', Enzyme_Class: 'Serine endopeptidases', Prediction: '3.4.21.53', '3.4.21.1': 0.2, '3.4.21.4': 0.3, '3.4.21.26': 0.4, '3.4.21.53': 91.2, '3.4.21.62': 1.4, '3.4.21.88': 0.6, '3.4.21.89': 0.5, '3.4.21.90': 0.3, '3.4.21.91': 0.3, '3.4.21.92': 0.8, '3.4.21.97': 0.4, '3.4.21.102': 0.7, '3.4.21.105': 0.7, '3.4.21.107': 0.6, Others: 1.6 }],
     'minpred_predictions.tsv': [{ SampleID: 'minpred_example_1', Prediction: 'preview-only output' }],
   },
 };
