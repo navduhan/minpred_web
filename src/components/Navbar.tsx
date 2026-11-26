@@ -16,19 +16,51 @@ const links = [
 export default function Navbar() {
   const pathname = usePathname();
   return (
-    <header className="sticky top-0 z-50 border-b border-[var(--line)] bg-white/95 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-white/12 bg-[#0f2439]/98 text-white shadow-[0_6px_24px_rgba(15,36,57,.18)] backdrop-blur">
       <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="group flex items-center gap-3" aria-label="MINpred home">
-          <span className="grid h-10 w-10 place-items-center bg-[var(--forest)] font-mono text-sm font-bold text-white">MP</span>
-          <span className="font-display text-xl font-semibold tracking-tight text-[var(--forest-dark)]">MINpred</span>
-        </Link>
-        <nav className="flex items-center gap-1 sm:gap-5" aria-label="Primary navigation">
+        <div className="flex items-center gap-3">
+          <Link href="/" className="group flex items-center gap-3" aria-label="MINpred home">
+            <span className="grid h-9 w-9 place-items-center rounded-md bg-[#0b7285] font-mono text-sm font-bold text-white shadow-sm">
+              MP
+            </span>
+            <span className="font-display text-xl font-bold tracking-tight text-white">MINpred</span>
+          </Link>
+          <span className="hidden rounded-md bg-white/10 px-2.5 py-1 font-mono text-xs font-medium text-sky-200 lg:inline-block">
+            v1.0 · ESM-2 650M
+          </span>
+        </div>
+        <nav className="flex items-center gap-1 sm:gap-4" aria-label="Primary navigation">
           {links.map(({ name, href, icon: Icon }) => {
             const active = pathname === href;
-            return <Link key={href} href={href} className={`nav-link ${active ? 'nav-link-active' : ''}`}><Icon className="h-4 w-4" /><span className="hidden sm:inline">{name}</span></Link>;
+            return (
+              <Link
+                key={href}
+                href={href}
+                aria-current={active ? 'page' : undefined}
+                className={`nav-link ${active ? 'nav-link-active' : ''}`}
+              >
+                <Icon className="h-4 w-4" aria-hidden="true" />
+                <span className="hidden sm:inline">{name}</span>
+              </Link>
+            );
           })}
         </nav>
-        <a href="https://www.usu.edu" target="_blank" rel="noreferrer" className="hidden md:block"><Image src={withBasePath('/assets/images/usulogo2.png')} alt="Utah State University" width={180} height={49} unoptimized /></a>
+        <a
+          href="https://www.usu.edu"
+          target="_blank"
+          rel="noreferrer"
+          className="hidden items-center md:flex"
+          aria-label="Utah State University"
+        >
+          <Image
+            src={withBasePath('/assets/images/usulogo2.png')}
+            alt="Utah State University"
+            width={162}
+            height={44}
+            className="h-9 w-auto brightness-0 invert opacity-95 transition hover:opacity-100"
+            unoptimized
+          />
+        </a>
       </div>
     </header>
   );
