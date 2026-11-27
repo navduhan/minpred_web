@@ -229,21 +229,34 @@ check_health() {
     return 1
 }
 
+resolve_standalone_ref() {
+    if [[ -n "${MINPRED_STANDALONE_REF:-}" ]]; then
+        printf '%s\n' "${MINPRED_STANDALONE_REF}"
+        return
+    fi
+    local resolved=""
+    resolved="$(git ls-remote https://github.com/usubioinfo/minpred.git refs/heads/main 2>/dev/null | awk 'NR==1 {print $1}' || true)"
+    printf '%s\n' "${resolved:-main}"
+}
+
 build_podman_app() {
     local cache_mode="${1:-cached}"
+    local standalone_ref
+    standalone_ref="$(resolve_standalone_ref)"
     local build_args=(
         build
         --jobs=1
         --pull
         --build-arg "NEXT_PUBLIC_BASE_PATH=$(current_value NEXT_PUBLIC_BASE_PATH)"
         --build-arg "NEXT_PUBLIC_TURNSTILE_SITE_KEY=$(current_value TURNSTILE_SITE_KEY)"
+        --build-arg "MINPRED_STANDALONE_REF=${standalone_ref}"
         --tag minpred-web:1.0
     )
     if [[ "${cache_mode}" == no-cache ]]; then
         build_args+=(--no-cache)
     fi
     build_args+=(.)
-    printf 'Building the MINpred application with one Podman stage at a time...\n'
+    printf 'Building the MINpred application (standalone ref: %s) with one Podman stage at a time...\n' "${standalone_ref}"
     podman "${build_args[@]}"
 }
 
@@ -265,14 +278,22 @@ run_existing_deployment() {
                 printf 'Update mode requires a Git checkout.\n' >&2
                 exit 1
             fi
+            local before_pull after_pull
+            before_pull="$(git -C "${SCRIPT_DIR}" rev-parse HEAD)"
             printf 'Updating the repository with a fast-forward-only pull...\n'
             git -C "${SCRIPT_DIR}" pull --ff-only
+            after_pull="$(git -C "${SCRIPT_DIR}" rev-parse HEAD)"
+            if [[ "${before_pull}" != "${after_pull}" && "${MINPRED_START_REEXEC:-0}" != 1 ]]; then
+                export MINPRED_START_REEXEC=1
+                exec "${SCRIPT_DIR}/start.sh" --update
+            fi
             "${ENGINE}" compose --env-file deploy/docker.env "${COMPOSE_FILES[@]}" config >/dev/null
             if [[ "${ENGINE}" == podman ]]; then
                 build_podman_app
                 "${ENGINE}" compose --env-file deploy/docker.env "${COMPOSE_FILES[@]}" up -d --no-build --force-recreate --remove-orphans
             else
-                "${ENGINE}" compose --env-file deploy/docker.env "${COMPOSE_FILES[@]}" up -d --build --remove-orphans
+                MINPRED_STANDALONE_REF="$(resolve_standalone_ref)" \
+                    "${ENGINE}" compose --env-file deploy/docker.env "${COMPOSE_FILES[@]}" up -d --build --remove-orphans
             fi
             ;;
         rebuild)
@@ -281,7 +302,8 @@ run_existing_deployment() {
             if [[ "${ENGINE}" == podman ]]; then
                 build_podman_app no-cache
             else
-                "${ENGINE}" compose --env-file deploy/docker.env "${COMPOSE_FILES[@]}" build --pull --no-cache
+                MINPRED_STANDALONE_REF="$(resolve_standalone_ref)" \
+                    "${ENGINE}" compose --env-file deploy/docker.env "${COMPOSE_FILES[@]}" build --pull --no-cache
             fi
             "${ENGINE}" compose --env-file deploy/docker.env "${COMPOSE_FILES[@]}" up -d
             ;;
@@ -454,7 +476,8 @@ if [[ "${ENGINE}" == podman ]]; then
     build_podman_app
     "${ENGINE}" compose --env-file deploy/docker.env "${COMPOSE_FILES[@]}" up -d --no-build
 else
-    "${ENGINE}" compose --env-file deploy/docker.env "${COMPOSE_FILES[@]}" up -d --build
+    MINPRED_STANDALONE_REF="$(resolve_standalone_ref)" \
+        "${ENGINE}" compose --env-file deploy/docker.env "${COMPOSE_FILES[@]}" up -d --build
 fi
 "${ENGINE}" compose --env-file deploy/docker.env "${COMPOSE_FILES[@]}" ps
 check_health

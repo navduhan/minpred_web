@@ -28,8 +28,10 @@ RUN bash /tmp/install-s4pred.sh \
     && chown -R root:root /opt/s4pred /opt/s4pred-venv \
     && chmod -R a-w /opt/s4pred /opt/s4pred-venv
 
+ARG MINPRED_STANDALONE_REF=main
 COPY deploy/package-standalone.sh /tmp/package-standalone.sh
-RUN bash /tmp/package-standalone.sh /opt/minpred-downloads
+RUN bash /tmp/package-standalone.sh /opt/minpred-downloads "$MINPRED_STANDALONE_REF" \
+    && rm -f /tmp/package-standalone.sh
 
 WORKDIR /app
 ENV NODE_ENV=production

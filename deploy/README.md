@@ -97,8 +97,6 @@ Private results are retained for 30 days by default (`PREDICTION_JOB_RETENTION_M
 
 Run `crontab -e` as the same unprivileged user that owns `deploy/data/jobs`; do not install this in root's crontab. The application also prunes expired directories when accepting a new job.
 
-Place release archives in `public/download/` only if direct downloads should be enabled. The directory is mounted at runtime and is never stored in Git or baked into the image.
-
 ## Structure prediction
 
 The application image installs the pinned S4PRED source and verified model weights during the Docker build using `deploy/install-s4pred.sh`. Secondary-structure requests therefore run inside the application container. Tertiary structures use ESMFold for sequences up to 400 residues and SWISS-MODEL for longer proteins. Set `SWISS_MODEL_TOKEN` in `deploy/docker.env` to enable the longer-sequence fallback.
@@ -107,6 +105,6 @@ The application image installs the pinned S4PRED source and verified model weigh
 
 Prediction is cluster-only. The application has no local inference path and reports a clear job failure when SSH, SLURM, the `dl-gpu` module, the standalone checkout, or the bundled Keras (`.keras`) models and ESM-2 backbone are unavailable.
 
-The image build packages the standalone revision pinned in `deploy/package-standalone.sh` into `/download/minpred-standalone.tar.gz`, with `SHA256SUMS` and `REVISION.txt`. Do not mount an empty host folder over `/app/public/download`: it would hide the packaged files.
+The image build automatically resolves the latest `main` commit of `usubioinfo/minpred` on GitHub (or an explicit `MINPRED_STANDALONE_REF` branch, tag, or commit SHA) via `deploy/package-standalone.sh` and packages it from `codeload.github.com` into `/app/public/download/minpred-standalone.tar.gz`, alongside `SHA256SUMS` and `REVISION.txt`. Passing the resolved commit SHA via `--build-arg MINPRED_STANDALONE_REF=...` (handled automatically by `./start.sh` and `./dockerbuild.sh`) keeps Podman/Docker layer caching intact when the standalone repository is unchanged while refreshing the archive automatically whenever `usubioinfo/minpred` advances. Do not mount an empty host folder over `/app/public/download`: it would hide the packaged files.
 
 The web job launcher accepts `protein` or `nucleotide` as its fifth argument. Nucleotide jobs use `TransDecoder.LongOrfs` from the `dl-gpu` module and retain `translated_proteins.fasta` in the private job directory so structure requests use the translated protein identifiers and sequences. Protein and nucleotide usage examples are on the Help page.

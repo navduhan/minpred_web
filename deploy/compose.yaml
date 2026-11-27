@@ -8,6 +8,7 @@ services:
       args:
         NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY:?set TURNSTILE_SITE_KEY}
         NEXT_PUBLIC_BASE_PATH: ${NEXT_PUBLIC_BASE_PATH:-/minpred}
+        MINPRED_STANDALONE_REF: ${MINPRED_STANDALONE_REF:-main}
     image: minpred-web:1.0
     container_name: minpred-web
     user: "${DOCKER_UID:-1000}:${DOCKER_GID:-1000}"
