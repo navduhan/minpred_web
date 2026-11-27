@@ -106,8 +106,8 @@ export default function SoilMineralizationCutawaySVG({
           stroke={BASALT}
           strokeWidth="1.6"
         />
-        <polyline
-          points="16,66 58,92 102,78 M 58,92 88,128 M 58,92 36,138 M 64,44 58,92"
+        <path
+          d="M 16 66 L 58 92 L 102 78 M 58 92 L 88 128 M 58 92 L 36 138 M 64 44 L 58 92"
           fill="none"
           stroke={BASALT}
           strokeWidth="1.1"
@@ -128,8 +128,8 @@ export default function SoilMineralizationCutawaySVG({
           stroke={BASALT}
           strokeWidth="1.6"
         />
-        <polyline
-          points="72,146 66,196 112,184 M 18,162 66,196 42,244 M 66,196 96,236"
+        <path
+          d="M 72 146 L 66 196 L 112 184 M 18 162 L 66 196 L 42 244 M 66 196 L 96 236"
           fill="none"
           stroke={BASALT}
           strokeWidth="1.1"
@@ -142,8 +142,8 @@ export default function SoilMineralizationCutawaySVG({
           stroke={BASALT}
           strokeWidth="1.5"
         />
-        <polyline
-          points="20,264 56,288 90,290 M 68,254 56,288 62,324"
+        <path
+          d="M 20 264 L 56 288 L 90 290 M 68 254 L 56 288 L 62 324"
           fill="none"
           stroke={BASALT}
           strokeWidth="1.1"
@@ -156,8 +156,8 @@ export default function SoilMineralizationCutawaySVG({
           stroke={BASALT}
           strokeWidth="1.6"
         />
-        <polyline
-          points="82,326 70,364 116,360 M 26,338 70,364 38,398"
+        <path
+          d="M 82 326 L 70 364 L 116 360 M 26 338 L 70 364 L 38 398"
           fill="none"
           stroke={BASALT}
           strokeWidth="1.1"

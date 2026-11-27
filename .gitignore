@@ -2,6 +2,7 @@
 node_modules/
 npm-debug.log*
 .next/
+.next-dev/
 *.tsbuildinfo
 /deploy/data/
 /public/download/
