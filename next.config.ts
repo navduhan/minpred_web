@@ -37,8 +37,12 @@ const nextConfig: NextConfig = {
     return [
       { source: "/:path*", headers: securityHeaders },
       {
-        // Prevent browsers/proxies from caching stale pre-deployment HTML & RSC manifests
-        // (avoids 404 ChunkLoadError when clicking Links after a container rebuild)
+        // Root basePath landing page (/minpred) — prevent caching stale pre-rebuild HTML/RSC manifests
+        source: "/",
+        headers: [{ key: "Cache-Control", value: "no-cache, must-revalidate" }],
+      },
+      {
+        // All sub-routes under basePath (/minpred/prediction, etc.) except immutable static assets
         source: "/((?!_next/static|_next/image|assets/|download/|favicon.ico).*)",
         headers: [{ key: "Cache-Control", value: "no-cache, must-revalidate" }],
       },

@@ -794,7 +794,7 @@ export default function PredictionPage() {
                   name="examplePreset"
                   value={selectedExample}
                   onChange={(e) => selectExample(e.target.value as ExampleSelection)}
-                  className="field !w-auto max-w-[260px] !py-1 !pl-2.5 !pr-8 text-xs font-bold"
+                  className="field !w-auto max-w-[260px] !py-1 !px-2.5 text-xs font-bold"
                 >
                   <option value="">Choose example by class name…</option>
                   {demoSequenceOptions.map(([key, label]) => (
