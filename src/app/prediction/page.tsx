@@ -140,6 +140,29 @@ export default function PredictionPage() {
   const activeGateNumber = phaseCards.find(([val]) => val === level)?.[1] ?? 4;
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const preset = params.get('example');
+    if (!preset) return;
+    void Promise.resolve().then(() => {
+      if (preset === 'mixed') {
+        setSelectedExample('mixed');
+        setSequenceType('prot');
+        setSequence(mixedDemoSequence);
+        setLevel('Phase4');
+        setPhase4Mode('automatic');
+      } else if (Object.prototype.hasOwnProperty.call(demoSequences, preset)) {
+        const key = preset as DemoSequenceKey;
+        setSelectedExample(key);
+        setSequenceType('prot');
+        setSequence(demoSequences[key].fasta);
+        setLevel('Phase4');
+        setPhase4Mode('specific');
+        setEnzymeClass(key);
+      }
+    });
+  }, []);
+
+  useEffect(() => {
     let cancelled = false;
     void Promise.resolve().then(() => {
       const raw = localStorage.getItem('minpred_active_job');
