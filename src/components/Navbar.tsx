@@ -18,17 +18,12 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b border-white/12 bg-[#0f2439]/98 text-white shadow-[0_6px_24px_rgba(15,36,57,.18)] backdrop-blur">
       <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-3">
-          <Link href="/" className="group flex items-center gap-3" aria-label="MINpred home">
-            <span className="grid h-9 w-9 place-items-center rounded-md bg-[#0b7285] font-mono text-sm font-bold text-white shadow-sm">
-              MP
-            </span>
-            <span className="font-display text-xl font-bold tracking-tight text-white">MINpred</span>
-          </Link>
-          <span className="hidden rounded-md bg-white/10 px-2.5 py-1 font-mono text-xs font-medium text-sky-200 lg:inline-block">
-            v1.0 · ESM-2 650M
+        <Link href="/" className="group flex items-center gap-3" aria-label="MINpred home">
+          <span className="grid h-9 w-9 place-items-center rounded-md bg-[#0b7285] font-mono text-sm font-bold text-white shadow-sm">
+            MP
           </span>
-        </div>
+          <span className="font-display text-xl font-bold tracking-tight text-white">MINpred</span>
+        </Link>
         <nav className="flex items-center gap-1 sm:gap-4" aria-label="Primary navigation">
           {links.map(({ name, href, icon: Icon }) => {
             const active = pathname === href;
