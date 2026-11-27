@@ -1,12 +1,28 @@
 import './globals.css';
-import Script from 'next/script';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import type { Metadata } from 'next';
+import Script from 'next/script';
+import Footer from '@/components/Footer';
+import Navbar from '@/components/Navbar';
 
 export const metadata: Metadata = {
-  title: 'MINpred',
-  description: 'Hierarchical prediction of nitrogen mineralization-related enzymes and class-specific EC numbers.',
+  title: 'MINpred · Soil Nitrogen Mineralization Enzyme & EC Prediction',
+  description:
+    'Alignment-free four-phase ESM-2 (650M) identification and four-digit EC classification of soil nitrogen-mineralization peptidases and amidohydrolases.',
+  keywords: [
+    'MINpred',
+    'Soil Nitrogen Mineralization',
+    'Peptidases',
+    'Amidohydrolases',
+    'Enzyme Commission',
+    'ESM-2',
+    'Protein Language Model',
+    'KAABiL',
+  ],
+  authors: [
+    { name: 'Naveen Duhan', url: 'https://github.com/navduhan' },
+    { name: 'Jeanette M. Norton' },
+    { name: 'Rakesh Kaundal', url: 'https://kaabil.net' },
+  ],
 };
 
 export default function RootLayout({
@@ -16,9 +32,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen flex flex-col antialiased">
+      <body className="min-h-screen flex flex-col bg-white antialiased">
         <Navbar />
-        <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 lg:px-8">
+        <main className="mx-auto w-full max-w-7xl flex-1 px-4 sm:px-6 lg:px-8">
           {children}
         </main>
         <Footer />

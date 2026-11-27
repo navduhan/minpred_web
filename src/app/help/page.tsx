@@ -1,129 +1,545 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { ArrowRight, BookOpen, CheckCircle2, CircleAlert } from 'lucide-react';
+import { ArrowRight, CircleAlert } from 'lucide-react';
 
 const contents = [
-  ['quick-start', 'Quick start'], ['input', 'Sequence input'], ['phases', 'Prediction phases'],
-  ['routing', 'Phase IV routing'], ['classes', 'Classes and EC labels'], ['results', 'Reading results'],
-  ['structures', 'Protein structures'], ['example', 'Worked example'], ['standalone', 'Standalone usage'],
-  ['troubleshooting', 'Troubleshooting'], ['privacy', 'Privacy and retention'],
-  ['limitations', 'Interpretation and limitations'], ['citation', 'Citation and support'],
+  ['quick-start', 'Quick start'],
+  ['input', 'Sequence input'],
+  ['phases', 'Prediction phases'],
+  ['routing', 'Phase IV routing'],
+  ['classes', 'Classes and EC labels'],
+  ['results', 'Reading results'],
+  ['structures', 'Protein structures'],
+  ['example', 'Worked example'],
+  ['standalone', 'Standalone usage'],
+  ['troubleshooting', 'Troubleshooting'],
+  ['privacy', 'Privacy and retention'],
+  ['limitations', 'Interpretation and limitations'],
+  ['citation', 'Citation and support'],
 ] as const;
 
 const phases = [
-  ['Phase I', 'Enzyme screen', 'Classifies every submitted protein as Enzyme or Non-enzyme. Only proteins predicted as enzymes continue.'],
-  ['Phase II', 'Mineralization screen', 'Classifies qualifying enzymes as Nitrogen Mineralization or Non-nitrogen Mineralization. Only the nitrogen-mineralization group continues.'],
-  ['Phase III', 'Enzyme class', 'Assigns each qualifying protein to one of the ten enzyme classes documented below.'],
-  ['Phase IV', 'EC assignment', 'Uses the Phase III class to select a class-specific model and predict an EC label.'],
+  [
+    'Phase I',
+    'Enzyme screen',
+    'Classifies every submitted protein as Enzyme or Non-enzyme. Only proteins predicted as enzymes continue.',
+  ],
+  [
+    'Phase II',
+    'Mineralization screen',
+    'Classifies qualifying enzymes as Nitrogen Mineralization or Non-nitrogen Mineralization. Only the nitrogen-mineralization group continues.',
+  ],
+  [
+    'Phase III',
+    'Enzyme class',
+    'Assigns each qualifying protein to one of the ten enzyme classes documented below.',
+  ],
+  [
+    'Phase IV',
+    'EC assignment',
+    'Uses the Phase III class to select a class-specific model (M1–M10) and predict a four-digit EC label.',
+  ],
 ] as const;
 
 const enzymeClasses = [
-  { abbreviation: 'AH', name: 'Amidohydrolases', description: 'Hydrolyze non-peptide carbon–nitrogen bonds, including urea and linear amides.', ec: ['3.5.1.1','3.5.1.2','3.5.1.4','3.5.1.5','3.5.1.11','3.5.1.28','Others'] },
-  { abbreviation: 'AP', name: 'Aminopeptidases', description: 'Remove amino-acid residues from the amino terminus of peptides or proteins.', ec: ['3.4.11.2','3.4.11.4','3.4.11.5','3.4.11.9','3.4.11.18','3.4.11.21','Others'] },
-  { abbreviation: 'AEP', name: 'Aspartic endopeptidases', description: 'Hydrolyze internal peptide bonds through an aspartate-dependent catalytic mechanism.', ec: ['3.4.23.24','3.4.23.36','3.4.23.43','Others'] },
-  { abbreviation: 'CEP', name: 'Cysteine endopeptidases', description: 'Use a catalytic cysteine to hydrolyze internal peptide bonds.', ec: ['3.4.22.15','3.4.22.28','3.4.22.50','3.4.22.66','Others'] },
-  { abbreviation: 'DP', name: 'Dipeptidases', description: 'Hydrolyze dipeptides into their component amino acids.', ec: ['3.4.13.9','3.4.13.19','3.4.13.21','Others'] },
-  { abbreviation: 'DPP', name: 'Dipeptidyl-peptidases', description: 'Release a dipeptide from the amino terminus of a peptide or protein.', ec: ['3.4.14.4','3.4.14.5','3.4.14.10','3.4.14.11','Others'] },
-  { abbreviation: 'MEP', name: 'Metalloendopeptidases', description: 'Use a metal ion to catalyze hydrolysis of internal peptide bonds.', ec: ['3.4.24.3','3.4.24.11','3.4.24.28','3.4.24.39','3.4.24.59','3.4.24.64','3.4.24.69','3.4.24.84','Others'] },
-  { abbreviation: 'MP', name: 'Metallopeptidases', description: 'Metal-dependent metallocarboxypeptidases represented by the EC 3.4.17 group.', ec: ['3.4.17.21','Others'] },
-  { abbreviation: 'OP', name: 'Omega peptidases', description: 'Hydrolyze specialized terminal or isopeptide linkages in the EC 3.4.19 group.', ec: ['3.4.19.3','3.4.19.12','3.4.19.13','Others'] },
-  { abbreviation: 'SEP', name: 'Serine endopeptidases', description: 'Use a catalytic serine to hydrolyze internal peptide bonds.', ec: ['3.4.21.1','3.4.21.4','3.4.21.26','3.4.21.53','3.4.21.62','3.4.21.88','3.4.21.89','3.4.21.90','3.4.21.91','3.4.21.92','3.4.21.97','3.4.21.102','3.4.21.105','3.4.21.107','Others'] },
+  {
+    abbreviation: 'AH',
+    name: 'Amidohydrolases',
+    description: 'Hydrolyze non-peptide carbon–nitrogen bonds, including urea and linear amides.',
+    ec: ['3.5.1.1', '3.5.1.2', '3.5.1.4', '3.5.1.5', '3.5.1.11', '3.5.1.28', 'Others'],
+  },
+  {
+    abbreviation: 'AP',
+    name: 'Aminopeptidases',
+    description: 'Remove amino-acid residues from the amino terminus of peptides or proteins.',
+    ec: ['3.4.11.2', '3.4.11.4', '3.4.11.5', '3.4.11.9', '3.4.11.18', '3.4.11.21', 'Others'],
+  },
+  {
+    abbreviation: 'AEP',
+    name: 'Aspartic endopeptidases',
+    description: 'Hydrolyze internal peptide bonds through an aspartate-dependent catalytic mechanism.',
+    ec: ['3.4.23.24', '3.4.23.36', '3.4.23.43', 'Others'],
+  },
+  {
+    abbreviation: 'CEP',
+    name: 'Cysteine endopeptidases',
+    description: 'Use a catalytic cysteine to hydrolyze internal peptide bonds.',
+    ec: ['3.4.22.15', '3.4.22.28', '3.4.22.50', '3.4.22.66', 'Others'],
+  },
+  {
+    abbreviation: 'DP',
+    name: 'Dipeptidases',
+    description: 'Hydrolyze dipeptides into their component amino acids.',
+    ec: ['3.4.13.9', '3.4.13.19', '3.4.13.21', 'Others'],
+  },
+  {
+    abbreviation: 'DPP',
+    name: 'Dipeptidyl-peptidases',
+    description: 'Release a dipeptide from the amino terminus of a peptide or protein.',
+    ec: ['3.4.14.4', '3.4.14.5', '3.4.14.10', '3.4.14.11', 'Others'],
+  },
+  {
+    abbreviation: 'MEP',
+    name: 'Metalloendopeptidases',
+    description: 'Use a metal ion to catalyze hydrolysis of internal peptide bonds.',
+    ec: [
+      '3.4.24.3',
+      '3.4.24.11',
+      '3.4.24.28',
+      '3.4.24.39',
+      '3.4.24.59',
+      '3.4.24.64',
+      '3.4.24.69',
+      '3.4.24.84',
+      'Others',
+    ],
+  },
+  {
+    abbreviation: 'MP',
+    name: 'Metallopeptidases',
+    description: 'Metal-dependent metallocarboxypeptidases represented by the EC 3.4.17 group.',
+    ec: ['3.4.17.21', 'Others'],
+  },
+  {
+    abbreviation: 'OP',
+    name: 'Omega peptidases',
+    description: 'Hydrolyze specialized terminal or isopeptide linkages in the EC 3.4.19 group.',
+    ec: ['3.4.19.3', '3.4.19.12', '3.4.19.13', 'Others'],
+  },
+  {
+    abbreviation: 'SEP',
+    name: 'Serine endopeptidases',
+    description: 'Use a catalytic serine to hydrolyze internal peptide bonds.',
+    ec: [
+      '3.4.21.1',
+      '3.4.21.4',
+      '3.4.21.26',
+      '3.4.21.53',
+      '3.4.21.62',
+      '3.4.21.88',
+      '3.4.21.89',
+      '3.4.21.90',
+      '3.4.21.91',
+      '3.4.21.92',
+      '3.4.21.97',
+      '3.4.21.102',
+      '3.4.21.105',
+      '3.4.21.107',
+      'Others',
+    ],
+  },
 ] as const;
 
-function Section({id, number, title, children}:{id:string; number:string; title:string; children:ReactNode}) {
-  return <section id={id} className="scroll-mt-28 border-b border-[var(--line)] px-6 py-8 last:border-b-0 sm:px-9 sm:py-10">
-    <header className="mb-6 grid grid-cols-[2.5rem_1fr] items-start gap-3"><span className="pt-1 text-xs font-black tracking-[.12em] text-[var(--mineral)]">{number}</span><h2 className="text-2xl font-bold tracking-[-.018em] text-[var(--forest-dark)] sm:text-3xl">{title}</h2></header>
-    <div className="ml-[3.25rem] space-y-4 text-[15px] leading-7 text-[var(--muted)]">{children}</div>
-  </section>;
+function Section({
+  id,
+  number,
+  title,
+  children,
+}: {
+  id: string;
+  number: string;
+  title: string;
+  children: ReactNode;
+}) {
+  return (
+    <section
+      id={id}
+      className="scroll-mt-24 border-b border-[var(--line)] px-6 py-7 last:border-b-0 sm:px-8 sm:py-9"
+    >
+      <header className="mb-5 grid grid-cols-[2.5rem_1fr] items-baseline gap-3">
+        <span className="font-mono text-xs font-extrabold tracking-widest text-[var(--ochre)]">
+          {number}
+        </span>
+        <h2 className="font-display text-xl font-bold text-[var(--navy)] sm:text-2xl">{title}</h2>
+      </header>
+      <div className="space-y-4 text-sm leading-relaxed text-[var(--muted)] sm:ml-[3.25rem]">
+        {children}
+      </div>
+    </section>
+  );
 }
 
-function Code({children}:{children:ReactNode}) { return <pre className="overflow-x-auto rounded-xl bg-[var(--forest-dark)] p-4 font-mono text-[13px] leading-6 text-white">{children}</pre>; }
+function Code({ children }: { children: ReactNode }) {
+  return (
+    <pre className="overflow-x-auto rounded-[2px] border border-[var(--navy-dark)] bg-[#142a2c] p-4 font-mono text-xs leading-6 text-slate-100">
+      {children}
+    </pre>
+  );
+}
 
 export default function Help() {
-  return <div className="py-6 sm:py-10">
-    <header className="border-y border-[var(--line)] py-9 sm:grid sm:grid-cols-[1fr_270px] sm:items-end sm:gap-10">
-      <div><p className="eyebrow flex items-center gap-2"><BookOpen className="h-4 w-4"/> User guide</p><h1 className="mt-4 max-w-3xl text-4xl font-bold tracking-[-.025em] text-[var(--forest-dark)] sm:text-5xl">Using MINpred</h1><p className="mt-4 max-w-3xl text-lg leading-8 text-[var(--muted)]">Prepare protein or nucleotide sequences, choose the appropriate phase, and interpret mineralization-enzyme, class, EC, and structure results.</p></div>
-      <div className="mt-7 border-l-2 border-[var(--mineral)] pl-5 text-sm leading-6 text-[var(--muted)] sm:mt-0"><strong className="block text-[var(--forest-dark)]">Need a first run?</strong>Use the mixed example with Phase IV and automatic class selection.</div>
-    </header>
+  return (
+    <div className="py-4 sm:py-6">
+      <header className="border-b border-[var(--line)] pb-6 sm:grid sm:grid-cols-[1fr_280px] sm:items-end sm:gap-10">
+        <div>
+          <p className="eyebrow">Documentation &amp; Technical Reference Manual</p>
+          <h1 className="mt-2 max-w-3xl font-display text-3xl font-semibold leading-tight text-[var(--navy)] sm:text-4xl">
+            MINpred workflow, EC coverage &amp; interpretation guide
+          </h1>
+          <p className="mt-2.5 max-w-3xl text-sm leading-relaxed text-[var(--muted)]">
+            Protocols for formatting protein or nucleotide FASTA inputs, operating the four-phase
+            ESM-2 (650M) neural cascade, interpreting class and four-digit EC probabilities, and
+            inspecting S4PRED 2D and ESMFold / SWISS-MODEL 3D structures.
+          </p>
+        </div>
+        <div className="mt-5 border-l-2 border-[var(--ochre)] pl-4 text-xs leading-relaxed text-[var(--muted)] sm:mt-0">
+          <strong className="block font-mono uppercase tracking-wider text-[var(--navy)]">
+            First test run
+          </strong>
+          Load the 10-class benchmark panel in Analyze Sequences with Phase IV automatic routing.
+        </div>
+      </header>
 
-    <div className="mt-8 grid items-start gap-8 lg:grid-cols-[230px_minmax(0,1fr)]">
-      <aside className="lg:sticky lg:top-24"><nav aria-label="Help contents"><p className="eyebrow">On this page</p><ol className="mt-4 border-l border-[var(--line)] text-sm leading-5">{contents.map(([id,label],index)=><li key={id}><a href={`#${id}`} className="grid grid-cols-[1.8rem_1fr] border-l-2 border-transparent px-4 py-2 text-[var(--muted)] transition hover:border-[var(--mineral)] hover:bg-white hover:text-[var(--forest-dark)]"><span className="text-[11px] font-bold text-[var(--mineral)]">{String(index+1).padStart(2,'0')}</span><span>{label}</span></a></li>)}</ol></nav><Link href="/prediction" className="btn-primary mt-6 w-full">Start prediction <ArrowRight className="h-4 w-4"/></Link></aside>
+      <div className="mt-8 grid items-start gap-8 lg:grid-cols-[225px_minmax(0,1fr)]">
+        <aside className="lg:sticky lg:top-20">
+          <nav aria-label="Help contents">
+            <p className="eyebrow">On this page</p>
+            <ol className="mt-3 border-l border-[var(--line)] text-xs leading-5">
+              {contents.map(([id, label], index) => (
+                <li key={id}>
+                  <a
+                    href={`#${id}`}
+                    className="grid grid-cols-[1.8rem_1fr] border-l-2 border-transparent px-3.5 py-1.5 text-[var(--muted)] transition hover:border-[var(--ochre)] hover:bg-[var(--surface)] hover:text-[var(--navy)]"
+                  >
+                    <span className="font-mono text-[11px] font-bold text-[var(--ochre)]">
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                    <span>{label}</span>
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+          <Link href="/prediction" className="btn-ochre mt-5 w-full text-xs">
+            Analyze Sequences <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </aside>
 
-      <main className="overflow-hidden rounded-xl border border-[var(--line)] bg-white shadow-[0_16px_45px_rgba(15,36,57,.07)]">
-        <Section id="quick-start" number="01" title="Quick start">
-          <ol className="list-decimal space-y-2 pl-5"><li>Open <Link className="font-semibold underline underline-offset-4" href="/prediction">Prediction</Link> and choose Protein or Nucleotide.</li><li>Paste FASTA, upload a file, or retrieve protein accessions. Use a supplied example to test the interface.</li><li>Select the last phase you need. Choose Phase IV with Determine automatically for the complete hierarchy.</li><li>Complete the verification and start the prediction. Processing time depends on input size, the compute queue, and structure services.</li><li>Keep the complete private results link and download the tables you need.</li></ol>
-        </Section>
+        <div className="surface">
+          <Section id="quick-start" number="01" title="Quick start">
+            <ol className="list-decimal space-y-2 pl-5 text-[var(--ink)]">
+              <li>
+                Open{' '}
+                <Link className="font-semibold text-[var(--ochre)] underline underline-offset-4" href="/prediction">
+                  Analyze Sequences
+                </Link>{' '}
+                and select <strong>Protein FASTA (AA)</strong> or{' '}
+                <strong>Nucleotide · TransDecoder</strong>.
+              </li>
+              <li>
+                Paste FASTA sequences, upload a file, fetch UniProtKB/NCBI accessions, or click a
+                held-out specimen code (<code className="font-mono">SEP</code>–
+                <code className="font-mono">AH</code>).
+              </li>
+              <li>
+                Choose your terminal phase. Keep <strong>Phase IV</strong> with{' '}
+                <strong>Auto (All 10)</strong> for end-to-end four-digit EC annotation.
+              </li>
+              <li>
+                Complete verification and execute the cascade. Save your private{' '}
+                <code className="font-mono">#job=...&amp;token=...</code> bookmark link and export
+                TSV/CSV/JSON tables.
+              </li>
+            </ol>
+          </Section>
 
-        <Section id="input" number="02" title="Sequence input">
-          <h3 className="font-bold text-[var(--forest-dark)]">Protein FASTA</h3><p>Each record begins with <code>&gt;</code> and a unique identifier, followed by an amino-acid sequence. The form accepts the 20 standard amino acids and X in upper or lower case. X residues are removed before prediction. Do not include alignment gaps, residue numbers, or terminal stop symbols.</p>
-          <h3 className="font-bold text-[var(--forest-dark)]">Nucleotide FASTA</h3><p>Select Nucleotide for DNA, RNA, or transcript FASTA containing A, C, G, T, U, or N. TransDecoder.LongOrfs identifies open reading frames and writes <code className="rounded bg-[var(--mist)] px-1.5 py-0.5">translated_proteins.fasta</code> before MINpred runs. Results therefore use predicted-protein identifiers. One nucleotide record can yield several proteins or no qualifying ORF.</p>
-          <h3 className="font-bold text-[var(--forest-dark)]">Accessions and examples</h3><p>Accession retrieval accepts protein identifiers from UniProtKB or NCBI Protein. Multiple identifiers can be separated by spaces, commas, or new lines. Review the returned FASTA before submission. The mixed example contains one representative sequence for each of the ten Phase IV enzyme classes; individual class examples are also available.</p>
-          <h3 className="font-bold text-[var(--forest-dark)]">Default request limits</h3><dl className="grid grid-cols-[1fr_auto] gap-x-6 gap-y-2 rounded-xl bg-[var(--mist)] p-4 text-sm"><dt>Sequences per request</dt><dd className="font-semibold text-[var(--forest-dark)]">10,000</dd><dt>Total residues or bases</dt><dd className="font-semibold text-[var(--forest-dark)]">50,000,000</dd><dt>Residues or bases per sequence</dt><dd className="font-semibold text-[var(--forest-dark)]">5,000</dd><dt>Protein accessions per lookup</dt><dd className="font-semibold text-[var(--forest-dark)]">100</dd><dt>Active jobs per client</dt><dd className="font-semibold text-[var(--forest-dark)]">2</dd></dl><p>Administrators can change these limits. For repeated analyses or large datasets, use the <Link className="font-semibold underline underline-offset-4" href="/download">standalone tool</Link>.</p>
-        </Section>
+          <Section id="input" number="02" title="Sequence input &amp; request limits">
+            <h3 className="font-bold text-[var(--navy)]">Protein FASTA</h3>
+            <p>
+              Each record begins with <code className="font-mono">&gt;</code> and a unique
+              identifier, followed by an amino-acid sequence. The workbench accepts the 20 standard
+              amino acids and <code className="font-mono">X</code> in upper or lower case (
+              <code className="font-mono">X</code> positions are stripped prior to ESM-2
+              tokenization). Remove alignment gaps or residue numbers.
+            </p>
+            <h3 className="font-bold text-[var(--navy)]">Nucleotide FASTA</h3>
+            <p>
+              Select <strong>Nucleotide · TransDecoder</strong> for DNA, RNA, or transcript FASTA
+              containing <code className="font-mono">A, C, G, T, U, N</code>.{' '}
+              <code className="font-mono">TransDecoder.LongOrfs</code> extracts candidate open
+              reading frames into <code className="font-mono">translated_proteins.fasta</code>{' '}
+              before running MINpred; result rows therefore carry predicted ORF identifiers.
+            </p>
+            <h3 className="font-bold text-[var(--navy)]">Default web limits</h3>
+            <dl className="grid grid-cols-[1fr_auto] gap-x-6 gap-y-2 border border-[var(--line)] bg-[var(--surface)] p-4 font-mono text-xs">
+              <dt className="text-[var(--ink)]">Sequences per request</dt>
+              <dd className="font-bold text-[var(--navy)]">10,000</dd>
+              <dt className="text-[var(--ink)]">Total residues or bases</dt>
+              <dd className="font-bold text-[var(--navy)]">50,000,000</dd>
+              <dt className="text-[var(--ink)]">Residues or bases per sequence</dt>
+              <dd className="font-bold text-[var(--navy)]">5,000</dd>
+              <dt className="text-[var(--ink)]">Protein accessions per lookup</dt>
+              <dd className="font-bold text-[var(--navy)]">100</dd>
+              <dt className="text-[var(--ink)]">Active jobs per client</dt>
+              <dd className="font-bold text-[var(--navy)]">2</dd>
+            </dl>
+          </Section>
 
-        <Section id="phases" number="03" title="The four prediction phases">
-          <p>Selecting a phase runs the preceding filters and stops at that phase. A downstream table contains only proteins that passed the required earlier filters.</p><div className="divide-y divide-[var(--line)] border-y border-[var(--line)]">{phases.map(([phase,title,text],index)=><article key={phase} className="grid gap-2 py-5 sm:grid-cols-[2.5rem_185px_1fr]"><span className="grid h-8 w-8 place-items-center rounded-full bg-[var(--forest)] text-xs font-bold text-white">{index+1}</span><div><p className="text-[11px] font-black uppercase tracking-[.1em] text-[var(--mineral)]">{phase}</p><h3 className="font-bold text-[var(--forest-dark)]">{title}</h3></div><p>{text}</p></article>)}</div><p>A Phase IV request does not guarantee a Phase IV row for every input sequence. If no proteins pass a filter, later phases may have no result table.</p>
-        </Section>
+          <Section id="phases" number="03" title="The four prediction phases">
+            <p>
+              Selecting a phase runs all preceding filters and stops at that phase. Downstream
+              tables include only proteins that passed every earlier gate.
+            </p>
+            <div className="divide-y divide-[var(--line)] border-y border-[var(--line)]">
+              {phases.map(([phase, title, text], index) => (
+                <article
+                  key={phase}
+                  className="grid gap-2 py-4 sm:grid-cols-[2.2rem_175px_1fr] sm:items-baseline"
+                >
+                  <span className="inline-grid h-6 w-6 place-items-center rounded-[2px] bg-[var(--navy)] font-mono text-xs font-bold text-white">
+                    {index + 1}
+                  </span>
+                  <div>
+                    <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-[var(--ochre)]">
+                      {phase}
+                    </p>
+                    <h3 className="font-bold text-[var(--navy)]">{title}</h3>
+                  </div>
+                  <p>{text}</p>
+                </article>
+              ))}
+            </div>
+          </Section>
 
-        <Section id="routing" number="04" title="Phase IV routing">
-          <div className="grid gap-5 md:grid-cols-2"><article className="rounded-xl border border-[var(--line)] p-5"><h3 className="font-bold text-[var(--forest-dark)]">Determine automatically</h3><p className="mt-2">Each sequence follows its own Phase III prediction to the corresponding Phase IV EC model. This is the appropriate choice for mixed or unknown inputs.</p></article><article className="rounded-xl border border-[var(--line)] p-5"><h3 className="font-bold text-[var(--forest-dark)]">Use a specific class</h3><p className="mt-2">MINpred applies the selected Phase IV model only to sequences assigned to that class in Phase III. It does not bypass earlier filters or force unmatched sequences into the class.</p></article></div><p>If no sequence matches the selected class, the job can complete without a Phase IV table. Use automatic routing unless the intended class is already known.</p>
-        </Section>
+          <Section id="routing" number="04" title="Phase IV routing">
+            <div className="grid gap-4 md:grid-cols-2">
+              <article className="border border-[var(--line)] border-t-2 border-t-[var(--navy)] bg-[var(--surface)] p-4">
+                <h3 className="font-bold text-[var(--navy)]">Auto (All 10)</h3>
+                <p className="mt-1.5 text-xs leading-relaxed">
+                  Each qualifying protein follows its own Phase III class assignment to the
+                  corresponding specialist Phase IV model (<code className="font-mono">M1–M10</code>
+                  ). Recommended for genomes, metagenomes, and mixed inputs.
+                </p>
+              </article>
+              <article className="border border-[var(--line)] border-t-2 border-t-[var(--ochre)] bg-[var(--surface)] p-4">
+                <h3 className="font-bold text-[var(--navy)]">Specific Class</h3>
+                <p className="mt-1.5 text-xs leading-relaxed">
+                  Applies the chosen Phase IV EC head only to proteins assigned to that class in
+                  Phase III; it never bypasses upstream filters or forces unmatched sequences into
+                  that class.
+                </p>
+              </article>
+            </div>
+          </Section>
 
-        <Section id="classes" number="05" title="Ten classes and their EC outputs">
-          <p>Phase III selects one enzyme class. Phase IV predicts among the four-digit EC labels provided by that class-specific model. MINpred covers 52 explicit four-digit EC numbers plus class-conditional <code>Others</code> outputs; incomplete three-digit wildcard entries (such as <code>3.4.x.-</code>) are excluded, and MINpred is not a predictor for every EC number outside nitrogen mineralization.</p>
-          <div className="divide-y divide-[var(--line)] border-y border-[var(--line)]">{enzymeClasses.map(group=><article key={group.name} className="grid gap-4 py-5 xl:grid-cols-[3rem_215px_1fr]"><span className="font-black text-[var(--mineral)]">{group.abbreviation}</span><div><h3 className="font-bold text-[var(--forest-dark)]">{group.name}</h3><p className="mt-1 text-xs leading-5">{group.description}</p></div><div className="flex flex-wrap content-start gap-1.5">{group.ec.map(label=><code key={label} className={`rounded-md border px-2 py-1 text-[11px] ${label==='Others'?'border-dashed border-[var(--field-border)] text-[var(--muted)]':'border-[var(--line)] bg-[var(--canvas)] text-[var(--forest-dark)]'}`}>{label}</code>)}</div></article>)}</div>
-          <div className="rounded-xl bg-[var(--mist)] p-5 text-sm"><p><strong className="text-[var(--forest-dark)]">Reading an EC label:</strong> the four positions describe progressively narrower catalytic categories. For example, <code>3.4.11.2</code> falls within hydrolases (3), peptide-bond hydrolases (3.4), aminopeptidases (3.4.11), and membrane alanyl aminopeptidase (3.4.11.2).</p><p className="mt-2"><code>Others</code> captures curated class members belonging to rarer four-digit EC numbers below the per-EC cluster-count threshold. Confirm current nomenclature in the <a className="font-semibold underline underline-offset-4" href="https://www.enzyme-database.org/" target="_blank" rel="noreferrer">IUBMB Enzyme Nomenclature database</a>.</p></div>
-        </Section>
+          <Section id="classes" number="05" title="Ten classes and explicit EC outputs">
+            <p>
+              MINpred resolves 52 explicit four-digit IUBMB EC numbers plus class-conditional{' '}
+              <code className="font-mono">Others</code> outputs across nine EC 3.4 peptidase
+              subclasses and EC 3.5.1 linear C–N amidohydrolases:
+            </p>
+            <div className="divide-y divide-[var(--line)] border-y border-[var(--line)]">
+              {enzymeClasses.map((group) => (
+                <article
+                  key={group.name}
+                  className="grid gap-3 py-4 xl:grid-cols-[3rem_205px_1fr]"
+                >
+                  <span className="font-mono text-xs font-extrabold text-[var(--ochre)]">
+                    {group.abbreviation}
+                  </span>
+                  <div>
+                    <h3 className="font-bold text-[var(--navy)]">{group.name}</h3>
+                    <p className="mt-0.5 text-xs leading-5">{group.description}</p>
+                  </div>
+                  <div className="flex flex-wrap content-start gap-1.5">
+                    {group.ec.map((label) => (
+                      <code
+                        key={label}
+                        className={`border px-2 py-0.5 font-mono text-[11px] ${
+                          label === 'Others'
+                            ? 'border-dashed border-[var(--field-border)] text-[var(--muted)]'
+                            : 'border-[var(--line-strong)] bg-[var(--surface)] font-semibold text-[var(--navy)]'
+                        }`}
+                      >
+                        {label}
+                      </code>
+                    ))}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </Section>
 
-        <Section id="results" number="06" title="Reading and downloading results">
-          <dl className="space-y-4"><div><dt className="font-bold text-[var(--forest-dark)]">Sequence ID</dt><dd>The identifier used to connect a protein across phase tables. Nucleotide submissions use translated ORF identifiers.</dd></div><div><dt className="font-bold text-[var(--forest-dark)]">Predicted category, class, or EC</dt><dd>The highest-scoring output for that phase. A missing downstream row usually means that the sequence did not pass an earlier filter or did not match a selected Phase IV class.</dd></div><div><dt className="font-bold text-[var(--forest-dark)]">Probability values (%)</dt><dd>Scores are displayed as percentages for all outputs in the active model. Gold, slate-blue, and terracotta markers identify the highest, second, and third values in each row. Phase I and II contain only two outputs. The markers show relative order, not confidence thresholds or experimental certainty.</dd></div><div><dt className="font-bold text-[var(--forest-dark)]">Phase III abbreviations</dt><dd>AH, AP, AEP, CEP, DP, DPP, MEP, MP, OP, and SEP are expanded directly below the Phase III table.</dd></div><div><dt className="font-bold text-[var(--forest-dark)]">Structure and annotation</dt><dd>Structure actions are optional and do not change the classification. Phase IV database links search the predicted EC in NCBI, UniProt, BRENDA, KEGG, and JGI.</dd></div></dl><p>Use TSV for a tab-delimited table, CSV for spreadsheet software, or JSON for scripts. Exports retain the original field names and values. Keep sequence identifiers unchanged when joining results across phases.</p>
-        </Section>
+          <Section id="results" number="06" title="Reading and exporting results">
+            <dl className="space-y-3">
+              <div>
+                <dt className="font-bold text-[var(--navy)]">Sequence ID</dt>
+                <dd>
+                  Connects each protein across Phase I–IV tables (sticky first column during
+                  horizontal scrolling).
+                </dd>
+              </div>
+              <div>
+                <dt className="font-bold text-[var(--navy)]">Probability values (%)</dt>
+                <dd>
+                  Calibrated neural probabilities are shown for all outputs in the active head.
+                  Pyrite-gold (<code className="font-mono">1</code>), mineral-verdigris (
+                  <code className="font-mono">2</code>), and basalt (<code className="font-mono">3</code>
+                  ) rank badges mark the top three scores per row.
+                </dd>
+              </div>
+              <div>
+                <dt className="font-bold text-[var(--navy)]">External database cross-links</dt>
+                <dd>
+                  Phase IV rows link directly to NCBI Protein, UniProtKB, BRENDA, KEGG, and JGI IMG
+                  for the predicted EC number, and tables export cleanly as TSV, CSV, or JSON.
+                </dd>
+              </div>
+            </dl>
+          </Section>
 
-        <Section id="structures" number="07" title="Secondary and three-dimensional structures">
-          <h3 className="font-bold text-[var(--forest-dark)]">Secondary structure — S4PRED</h3><p>Select Predict secondary for a result row. AA is the amino-acid sequence, Pred is the residue assignment, Cart is the graphical representation, and Conf is the per-residue predictor score from 0 to 9. H denotes helix, E strand, and C coil. The result can be downloaded as text, PNG, or SVG.</p>
-          <h3 className="font-bold text-[var(--forest-dark)]">Three-dimensional structure</h3><p>MINpred tries ESMFold for proteins up to 400 residues. Longer proteins use SWISS-MODEL; when configured, SWISS-MODEL also provides a fallback if ESMFold is unavailable. Template availability and service queues can affect whether and when a model is returned.</p><p>The interactive viewer supports rotation, zoom, representation and color controls, and PDB, PNG, or SVG export. Predicted coordinates are computational models, not experimental structures.</p>
-        </Section>
+          <Section id="structures" number="07" title="Secondary and 3D structure inspection">
+            <p>
+              <strong className="text-[var(--navy)]">Secondary structure (S4PRED):</strong> Runs
+              locally inside the web container, reporting per-residue Helix (<code className="font-mono">H</code>
+              ), Strand (<code className="font-mono">E</code>), and Coil (<code className="font-mono">C</code>)
+              states plus confidence scores (0–9) with text, PNG, and SVG export.
+            </p>
+            <p>
+              <strong className="text-[var(--navy)]">Three-dimensional folding:</strong> Uses
+              ESMFold for sequences up to 400 residues and SWISS-MODEL homology modeling for longer
+              proteins when configured, rendered in an interactive WebGL viewer with PDB export.
+            </p>
+          </Section>
 
-        <Section id="example" number="08" title="Worked example">
-          <ol className="list-decimal space-y-2 pl-5"><li>Open Prediction and keep Protein selected.</li><li>Choose Paste sequence, then select <strong>Mixed panel · all 10 Phase IV classes</strong> from the example menu.</li><li>Select Phase IV and <strong>Determine automatically</strong>.</li><li>Complete verification and start the prediction.</li><li>Read Phase I first, then follow retained sequence IDs through Phases II and III. Phase IV is separated by the class-specific EC model used for each routed sequence.</li><li>Use the colored rank markers to compare scores within a row, and download the tables before the displayed expiry date.</li></ol><p>The examples demonstrate the input and output workflow. They are not a performance benchmark and do not substitute for independent validation.</p>
-        </Section>
+          <Section id="example" number="08" title="Worked benchmark example">
+            <ol className="list-decimal space-y-1.5 pl-5">
+              <li>
+                Open <Link className="font-semibold underline" href="/prediction?example=mixed">Analyze Sequences with the 10-Class Benchmark</Link>.
+              </li>
+              <li>
+                Verify <strong>Phase IV</strong> and <strong>Auto (All 10)</strong> are active,
+                complete Turnstile verification, and click <strong>Execute MINpred Cascade</strong>.
+              </li>
+              <li>
+                Inspect Phase I → II → III retention, then switch across the ten specialist Phase IV
+                EC tabs to audit four-digit EC probabilities.
+              </li>
+            </ol>
+          </Section>
 
-        <Section id="standalone" number="09" title="Standalone usage">
-          <p>The command-line tool uses the same four-phase ESM-2 (650M) + MLP hierarchy, ships with all 13 Keras (<code>.keras</code>) models and <code>.npz</code> StandardScalers bundled inside the package, and supports automatic or class-restricted Phase IV analysis.</p><Code>{`# Protein FASTA, automatic routing through Phase IV
-minpred -i proteins.fasta -o results
+          <Section id="standalone" number="09" title="Standalone CLI quick reference">
+            <p>
+              Install from <Link className="font-semibold underline" href="/download">Standalone CLI</Link>{' '}
+              to run offline or proteome-scale analyses with all 13 bundled checkpoints:
+            </p>
+            <Code>{`# Verify SHA-256 checksums of all 13 bundled .keras + .npz files
+minpred models-status
 
-# Restrict Phase IV to one class
-minpred -i proteins.fasta -o results -p 4 -c serine
+# Full four-phase EC prediction on protein FASTA
+minpred -i proteins.fasta -o MINpred_results
 
-# Nucleotide or transcript FASTA through TransDecoder
-minpred -i transcripts.fasta -o results -t nucleotide`}</Code><p>Run <code>minpred models-status</code> to verify SHA-256 checksums of all bundled model files. On first run, PyTorch/Transformers caches <code>facebook/esm2_t33_650M_UR50D</code> locally. TransDecoder is an external dependency for nucleotide input.</p>
-        </Section>
+# Restrict Phase IV to serine endopeptidases
+minpred -i proteins.fasta -o MINpred_results -p 4 -c serine
 
-        <Section id="troubleshooting" number="10" title="Troubleshooting">
-          <div className="space-y-3">{[
-            ['FASTA is rejected', 'Confirm that every record has a unique header and a non-empty sequence. Remove alignment gaps, spaces inside sequences, residue numbers, and stop symbols. Check that the selected sequence type matches the alphabet.'],
-            ['No downstream rows', 'Review the preceding phase. A sequence must pass each earlier filter, and class-restricted Phase IV also requires a matching Phase III assignment.'],
-            ['Nucleotide input produces no proteins', 'TransDecoder may not find a qualifying open reading frame in short, incomplete, or non-coding records. Inspect the TransDecoder log and translated_proteins.fasta in a standalone run.'],
-            ['Prediction remains queued or fails', 'Compute availability, SSH, SLURM, model files, or the cluster environment may be unavailable. Keep the job ID and exact error text for support; avoid repeatedly submitting the same large input.'],
-            ['Structure prediction fails', 'Classification results remain available. Retry later. Long proteins require a configured SWISS-MODEL token, and the interactive viewer requires browser WebGL support.'],
-            ['Results cannot be reopened', 'Use the complete original private link. It may be incomplete, expired, or associated with another deployment. A job ID alone is not sufficient.'],
-          ].map(([title,body])=><details key={title} className="rounded-xl border border-[var(--line)] px-4 py-3"><summary className="cursor-pointer font-bold text-[var(--forest-dark)]">{title}</summary><p className="mt-2">{body}</p></details>)}</div>
-        </Section>
+# Nucleotide contigs or transcripts via TransDecoder
+minpred -i transcripts.fasta -o MINpred_nucl -t nucleotide`}</Code>
+          </Section>
 
-        <Section id="privacy" number="11" title="Privacy and result retention">
-          <p>Anyone with the complete result link can access that job. Keep it private and do not include it in public issue reports. Submitted sequences and results are deleted after 30 days by default; download important tables before the displayed availability date.</p><p>Classification runs on the configured compute cluster. A tertiary-structure request sends the selected protein sequence to ESMFold or SWISS-MODEL. Do not request external structure prediction for confidential sequences unless you are authorized to share them with those services.</p>
-        </Section>
+          <Section id="troubleshooting" number="10" title="Troubleshooting">
+            <div className="divide-y divide-[var(--line)] border border-[var(--line)]">
+              {[
+                [
+                  'FASTA input is rejected',
+                  'Ensure every sequence starts with a unique >identifier header, contains at least 10 residues, and matches the selected alphabet (Protein vs. Nucleotide).',
+                ],
+                [
+                  'No downstream Phase II–IV rows appear',
+                  'Sequences predicted as Non-enzyme in Phase I or Non-nitrogen Mineralization in Phase II are filtered out by design. Inspect the preceding phase table for probabilities.',
+                ],
+                [
+                  'Nucleotide FASTA yields zero proteins',
+                  'Short or non-coding fragments may contain no qualifying open reading frame under TransDecoder.LongOrfs.',
+                ],
+                [
+                  'Result link cannot be reopened',
+                  'Both the job ID and cryptographic #token=... fragment from the original private bookmark URL are required; jobs expire automatically after 30 days.',
+                ],
+              ].map(([title, body], idx) => (
+                <details
+                  key={title}
+                  name="minpred-troubleshooting"
+                  open={idx === 0}
+                  className="bg-white px-4 py-3"
+                >
+                  <summary className="cursor-pointer font-bold text-[var(--navy)]">{title}</summary>
+                  <p className="mt-2 text-xs leading-relaxed text-[var(--muted)]">{body}</p>
+                </details>
+              ))}
+            </div>
+          </Section>
 
-        <Section id="limitations" number="12" title="Interpretation and limitations">
-          <div className="flex gap-3 rounded-lg border border-[#b4dce6] bg-[var(--mineral-soft)] p-4"><CircleAlert className="mt-1 h-5 w-5 shrink-0 text-[var(--mineral)]"/><p>MINpred provides sequence-based predictions. It does not measure enzyme activity, substrate specificity, gene expression, reaction rate, metabolic flux, or nitrogen mineralization in an environmental sample.</p></div><p>Coverage is limited to the documented classes and EC outputs. An unfamiliar, fragmentary, or out-of-scope protein can still receive a high model score. Each later phase depends on earlier routing, so uncertainty accumulates through the hierarchy.</p><p>Interpret predictions with sequence quality, reference annotations, homology, domain evidence, genomic context, and experimental results where available.</p>
-        </Section>
+          <Section id="privacy" number="11" title="Privacy and retention">
+            <p>
+              Each web submission is protected by a 256-bit ownership token kept in the URL fragment
+              (<code className="font-mono">#job=...&amp;token=...</code>) so tokens are not leaked
+              in external HTTP Referer headers. Job directories are purged automatically after 30
+              days. Tertiary-structure requests transmit only the selected protein sequence to
+              ESMFold or SWISS-MODEL.
+            </p>
+          </Section>
 
-        <Section id="citation" number="13" title="Citation, reproducibility, and support">
-          <p>When reporting an analysis, record MINpred version 1.0.0, the webserver URL and access date, input type, selected phase, Phase IV routing choice, and the downloaded result tables. For standalone work, also record the software revision and model status.</p>
-          <blockquote className="border-l-2 border-[var(--mineral)] pl-5 text-[var(--forest-dark)]">Duhan, N., Norton, J. M., &amp; Kaundal, R. (2026). <em>MINpred: A Hierarchical Protein Language Model Framework for Predicting Nitrogen-Mineralization Enzymes</em> (Version 1.0.0). Available at <a className="underline underline-offset-4" href="https://kaabil.net/minpred" target="_blank" rel="noreferrer">https://kaabil.net/minpred</a> and <a className="underline underline-offset-4" href="https://github.com/usubioinfo/minpred" target="_blank" rel="noreferrer">https://github.com/usubioinfo/minpred</a>.</blockquote>
-          <div className="flex gap-3 rounded-xl bg-[var(--mist)] p-4"><CheckCircle2 className="mt-1 h-5 w-5 shrink-0 text-[var(--forest)]"/><p>For assistance, contact <a className="font-semibold underline underline-offset-4" href="mailto:naveen.duhan@usu.edu">Naveen Duhan</a>. Report software issues through the <a className="font-semibold underline underline-offset-4" href="https://github.com/usubioinfo/minpred_web/issues" target="_blank" rel="noreferrer">webserver issue tracker</a> or <a className="font-semibold underline underline-offset-4" href="https://github.com/usubioinfo/minpred/issues" target="_blank" rel="noreferrer">standalone issue tracker</a>. Do not include private tokens, credentials, or confidential sequences.</p></div>
-        </Section>
-      </main>
+          <Section id="limitations" number="12" title="Interpretation and limitations">
+            <div className="flex gap-3 border-l-2 border-[var(--ochre)] bg-[var(--ochre-soft)] p-4 text-xs leading-relaxed text-[var(--ink)]">
+              <CircleAlert className="mt-0.5 h-4 w-4 shrink-0 text-[var(--ochre)]" />
+              <p>
+                MINpred predicts catalytic potential from primary sequence representations; it does
+                not directly measure transcriptional expression, in-situ soil enzyme kinetics, or
+                ecosystem mineralization flux, and its scope is bounded to the ten documented
+                nitrogen-mineralization classes.
+              </p>
+            </div>
+          </Section>
+
+          <Section id="citation" number="13" title="Citation, reproducibility &amp; support">
+            <blockquote className="border-l-2 border-[var(--ochre)] pl-4 text-[var(--ink)]">
+              Duhan, N., Norton, J. M., &amp; Kaundal, R. (2026).{' '}
+              <em className="font-semibold text-[var(--navy)]">
+                MINpred: A Hierarchical Protein Language Model Framework for Predicting
+                Nitrogen-Mineralization Enzymes
+              </em>{' '}
+              (Version 1.0.0). Available at{' '}
+              <a
+                className="font-mono text-xs underline underline-offset-2"
+                href="https://kaabil.net/minpred"
+                target="_blank"
+                rel="noreferrer"
+              >
+                https://kaabil.net/minpred
+              </a>{' '}
+              and{' '}
+              <a
+                className="font-mono text-xs underline underline-offset-2"
+                href="https://github.com/usubioinfo/minpred"
+                target="_blank"
+                rel="noreferrer"
+              >
+                https://github.com/usubioinfo/minpred
+              </a>
+              .
+            </blockquote>
+            <p className="text-xs">
+              For technical support, contact{' '}
+              <a
+                className="font-semibold text-[var(--navy)] underline underline-offset-4"
+                href="mailto:naveen.duhan@usu.edu"
+              >
+                Naveen Duhan
+              </a>{' '}
+              or open an issue on{' '}
+              <a
+                className="font-semibold text-[var(--ochre)] underline underline-offset-4"
+                href="https://github.com/usubioinfo/minpred/issues"
+                target="_blank"
+                rel="noreferrer"
+              >
+                github.com/usubioinfo/minpred
+              </a>
+              .
+            </p>
+          </Section>
+        </div>
+      </div>
     </div>
-  </div>;
+  );
 }
