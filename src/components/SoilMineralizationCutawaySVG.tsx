@@ -36,7 +36,7 @@ export default function SoilMineralizationCutawaySVG({
   return (
     <svg
       viewBox="0 0 1120 416"
-      className="block w-full select-none bg-white"
+      className="block w-full bg-white"
       role="img"
       aria-label="Interactive soil-to-root nitrogen mineralization cutaway showing 4 extracellular endopeptidases, 5 microbial exopeptidases and dipeptidases, trimeric amidohydrolase ammonification, and plant root hair ammonium uptake"
     >
@@ -69,9 +69,9 @@ export default function SoilMineralizationCutawaySVG({
       <text
         x="20"
         y="24"
-        fontSize="10.5"
+        fontSize="11"
         fontWeight="800"
-        fill="#4f6162"
+        fill={BASALT}
         fontFamily="ui-monospace, SFMono-Regular, monospace"
       >
         01 · SOIL MINERAL-ORGANIC MATRIX (DEPOLYMERIZATION)
@@ -79,7 +79,7 @@ export default function SoilMineralizationCutawaySVG({
       <text
         x="458"
         y="24"
-        fontSize="10.5"
+        fontSize="11"
         fontWeight="800"
         fill={VERDIGRIS}
         fontFamily="ui-monospace, SFMono-Regular, monospace"
@@ -89,9 +89,9 @@ export default function SoilMineralizationCutawaySVG({
       <text
         x="748"
         y="24"
-        fontSize="10.5"
+        fontSize="11"
         fontWeight="800"
-        fill="#9a670c"
+        fill="#8f5f08"
         fontFamily="ui-monospace, SFMono-Regular, monospace"
       >
         03 · AMMONIFICATION &amp; ROOT NH₄⁺ UPTAKE
@@ -246,7 +246,7 @@ export default function SoilMineralizationCutawaySVG({
           y="25"
           width="52"
           height="20"
-          rx="2"
+          rx="5"
           fill={badgeFill('serine')}
           stroke={stroke('serine')}
           strokeWidth="1.6"
@@ -302,7 +302,7 @@ export default function SoilMineralizationCutawaySVG({
           y="27"
           width="52"
           height="20"
-          rx="2"
+          rx="5"
           fill={badgeFill('metalloendopeptidases')}
           stroke={stroke('metalloendopeptidases')}
           strokeWidth="1.6"
@@ -343,7 +343,7 @@ export default function SoilMineralizationCutawaySVG({
           y="23"
           width="52"
           height="20"
-          rx="2"
+          rx="5"
           fill={badgeFill('cysteine')}
           stroke={stroke('cysteine')}
           strokeWidth="1.6"
@@ -385,7 +385,7 @@ export default function SoilMineralizationCutawaySVG({
           y="21"
           width="52"
           height="20"
-          rx="2"
+          rx="5"
           fill={badgeFill('aspartic')}
           stroke={stroke('aspartic')}
           strokeWidth="1.6"
@@ -473,7 +473,7 @@ export default function SoilMineralizationCutawaySVG({
         aria-label="AP: Aminopeptidases (EC 3.4.11)"
         onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onSelect('aminopeptidases')}
       >
-        {isSel('aminopeptidases') ? <rect x="-86" y="-24" width="212" height="48" rx="2" fill={PYRITE} opacity="0.14" /> : null}
+        {isSel('aminopeptidases') ? <rect x="-86" y="-24" width="212" height="48" rx="8" fill={PYRITE} opacity="0.14" /> : null}
         <polyline points="-76,4 -58,-4 -40,4 -26,-2" fill="none" stroke={BASALT} strokeWidth="3.2" />
         <path
           d="M 14 -9 A 17 17 0 1 0 14 9 L 2 0 Z"
@@ -489,7 +489,7 @@ export default function SoilMineralizationCutawaySVG({
           y="-10"
           width="48"
           height="20"
-          rx="2"
+          rx="5"
           fill={badgeFill('aminopeptidases')}
           stroke={stroke('aminopeptidases')}
           strokeWidth="1.6"
@@ -517,7 +517,7 @@ export default function SoilMineralizationCutawaySVG({
         aria-label="DPP: Dipeptidyl-peptidases (EC 3.4.14)"
         onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onSelect('dipeptidyl')}
       >
-        {isSel('dipeptidyl') ? <rect x="-86" y="-24" width="212" height="48" rx="2" fill={PYRITE} opacity="0.14" /> : null}
+        {isSel('dipeptidyl') ? <rect x="-86" y="-24" width="212" height="48" rx="8" fill={PYRITE} opacity="0.14" /> : null}
         <line x1="-76" y1="0" x2="-32" y2="0" stroke={BASALT} strokeWidth="3.4" strokeDasharray="9 3" />
         <polygon
           points="-14,-16 10,-16 20,0 10,16 -14,16 -6,0"
@@ -532,7 +532,7 @@ export default function SoilMineralizationCutawaySVG({
           y="-10"
           width="48"
           height="20"
-          rx="2"
+          rx="5"
           fill={badgeFill('dipeptidyl')}
           stroke={stroke('dipeptidyl')}
           strokeWidth="1.6"
@@ -560,7 +560,7 @@ export default function SoilMineralizationCutawaySVG({
         aria-label="OP: Omega peptidases (EC 3.4.19)"
         onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onSelect('omega')}
       >
-        {isSel('omega') ? <rect x="-86" y="-24" width="212" height="48" rx="2" fill={PYRITE} opacity="0.14" /> : null}
+        {isSel('omega') ? <rect x="-86" y="-24" width="212" height="48" rx="8" fill={PYRITE} opacity="0.14" /> : null}
         <line x1="-74" y1="4" x2="-34" y2="4" stroke={BASALT} strokeWidth="3" />
         <line x1="-54" y1="4" x2="-42" y2="-10" stroke={PYRITE} strokeWidth="2.8" />
         <polygon points="-42,-15 -36,-10 -42,-5 -48,-10" fill={PYRITE} stroke={BASALT} strokeWidth="0.9" />
@@ -577,7 +577,7 @@ export default function SoilMineralizationCutawaySVG({
           y="-10"
           width="48"
           height="20"
-          rx="2"
+          rx="5"
           fill={badgeFill('omega')}
           stroke={stroke('omega')}
           strokeWidth="1.6"
@@ -606,7 +606,7 @@ export default function SoilMineralizationCutawaySVG({
         onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onSelect('metallopeptidases')}
       >
         {isSel('metallopeptidases') ? (
-          <rect x="-86" y="-24" width="212" height="48" rx="2" fill={PYRITE} opacity="0.14" />
+          <rect x="-86" y="-24" width="212" height="48" rx="8" fill={PYRITE} opacity="0.14" />
         ) : null}
         <line x1="-74" y1="0" x2="-36" y2="0" stroke={BASALT} strokeWidth="3.2" />
         <rect x="-40" y="-4" width="9" height="8" fill={PYRITE} stroke={BASALT} strokeWidth="0.9" />
@@ -624,7 +624,7 @@ export default function SoilMineralizationCutawaySVG({
           y="-10"
           width="48"
           height="20"
-          rx="2"
+          rx="5"
           fill={badgeFill('metallopeptidases')}
           stroke={stroke('metallopeptidases')}
           strokeWidth="1.6"
@@ -652,7 +652,7 @@ export default function SoilMineralizationCutawaySVG({
         aria-label="DP: Dipeptidases (EC 3.4.13)"
         onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onSelect('dipeptidases')}
       >
-        {isSel('dipeptidases') ? <rect x="-86" y="-24" width="212" height="48" rx="2" fill={PYRITE} opacity="0.14" /> : null}
+        {isSel('dipeptidases') ? <rect x="-86" y="-24" width="212" height="48" rx="8" fill={PYRITE} opacity="0.14" /> : null}
         <circle cx="-62" cy="0" r="4.8" fill={VERDIGRIS} stroke={BASALT} strokeWidth="1.2" />
         <line x1="-57" y1="0" x2="-45" y2="0" stroke={PYRITE} strokeWidth="2.6" />
         <circle cx="-40" cy="0" r="4.8" fill={PYRITE} stroke={BASALT} strokeWidth="1.2" />
@@ -669,7 +669,7 @@ export default function SoilMineralizationCutawaySVG({
           y="-10"
           width="48"
           height="20"
-          rx="2"
+          rx="5"
           fill={badgeFill('dipeptidases')}
           stroke={stroke('dipeptidases')}
           strokeWidth="1.6"
@@ -759,7 +759,7 @@ export default function SoilMineralizationCutawaySVG({
           y="46"
           width="52"
           height="20"
-          rx="2"
+          rx="5"
           fill={badgeFill('amidohydrolases')}
           stroke={stroke('amidohydrolases')}
           strokeWidth="1.6"

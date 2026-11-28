@@ -38,22 +38,22 @@ export default function RouteError({
         <h1 className="font-display text-2xl font-bold text-[var(--navy)]">
           Page update detected — reload required
         </h1>
-        <p className="text-sm leading-relaxed text-[var(--muted)]">
+        <p className="text-base leading-relaxed text-[var(--ink-secondary)]">
           A newer version of MINpred was deployed while this tab was open, or a temporary network
           interruption occurred during navigation. Reloading fetches the updated interface cleanly.
         </p>
-        <div className="flex flex-wrap gap-2.5 pt-1">
+        <div className="flex flex-wrap gap-3 pt-1">
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="btn-amber text-xs"
+            className="btn-amber"
           >
             Reload Page
           </button>
-          <button type="button" onClick={() => reset()} className="btn-outline-sharp text-xs">
+          <button type="button" onClick={() => reset()} className="btn-outline-sharp">
             Try Again
           </button>
-          <a href={withBasePath('/prediction')} className="btn-ghost-rule text-xs">
+          <a href={withBasePath('/prediction')} className="btn-ghost-rule">
             Open Predict Directly →
           </a>
         </div>

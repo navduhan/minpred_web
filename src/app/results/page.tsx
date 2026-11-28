@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { CheckCircle2, Download, ExternalLink, FlaskConical, Loader2 } from 'lucide-react';
+import { Download, ExternalLink, FlaskConical, Loader2 } from 'lucide-react';
 import { withBasePath } from '@/lib/base-path';
 import { expiresAt, readJobBookmark, type JobBookmark } from '@/lib/job-bookmark';
 
@@ -138,13 +138,13 @@ const meta = (n: string) => {
 
 const interpretation = (phase: string) =>
   phase.includes('Phase_1')
-    ? 'Probabilities are shown for both enzyme and non-enzyme outcomes.'
+    ? 'Probabilities (%) shown for Enzyme vs. Non-enzyme outcomes.'
     : phase.includes('Phase_2')
-      ? 'Probabilities are shown for nitrogen-mineralization and non-mineralization outcomes.'
+      ? 'Probabilities (%) shown for Nitrogen Mineralization vs. Non-mineralization.'
       : phase.includes('Phase_3')
-        ? 'Probabilities are shown for all 10 nitrogen-mineralization enzyme classes.'
+        ? 'Probabilities (%) shown across all 10 nitrogen-mineralization enzyme classes.'
         : phase.includes('Phase_4')
-          ? 'Probabilities are shown for every EC label within this routed enzyme class. Compare enzyme-class probabilities in Phase III.'
+          ? 'Probabilities (%) shown across all EC numbers within this routed enzyme class.'
           : '';
 
 const metadataColumns = new Set([
@@ -292,7 +292,7 @@ export default function ResultsPage() {
         );
         if (response.ok && !cancelled) setStructures(await response.json());
       } catch {
-        // Keep last known status when transient network hiccup occurs
+        // Keep last known status
       }
     };
     void refresh();
@@ -343,7 +343,7 @@ export default function ResultsPage() {
           JSON.stringify({ job: bookmark.jobId, sample: sampleId, kind, data: value }),
         );
       } catch {
-        // Server cache remains available if sessionStorage is restricted
+        // Server cache remains available
       }
       const fragment = new URLSearchParams({
         job: bookmark.jobId,
@@ -373,14 +373,15 @@ export default function ResultsPage() {
       <div className="mx-auto max-w-3xl py-14">
         <section className="surface p-10 text-center">
           <FlaskConical className="mx-auto h-8 w-8 text-[var(--ochre)]" />
-          <h1 className="mt-4 font-display text-3xl font-semibold text-[var(--navy)]">
-            No results loaded
+          <h1 className="mt-4 font-display text-3xl font-bold text-[var(--navy)]">
+            No active prediction report loaded
           </h1>
-          <p className="mt-2 text-sm text-[var(--muted)]">
-            {error || 'Submit protein or nucleotide FASTA sequences to generate cascade results.'}
+          <p className="mt-2 text-base text-[var(--ink-secondary)]">
+            {error ||
+              'Submit protein or nucleotide FASTA sequences on the Predict page, or open a saved private bookmark URL (#job=...&token=...).'}
           </p>
-          <Link href="/prediction" className="btn-ochre mt-6">
-            Open Analyze Sequences
+          <Link href="/prediction" className="btn-amber mt-6">
+            Open Prediction Workspace
           </Link>
         </section>
       </div>
@@ -388,22 +389,18 @@ export default function ResultsPage() {
   }
 
   return (
-    <div className="space-y-6 py-4 sm:py-6">
-      <header className="border-b border-[var(--line)] pb-5 sm:grid sm:grid-cols-[1fr_auto] sm:items-end sm:gap-8">
+    <div className="space-y-6 py-6 pb-10">
+      {/* Compact Report Header */}
+      <header className="flex flex-col justify-between gap-4 border-b border-[var(--line-strong)] pb-5 sm:flex-row sm:items-center">
         <div>
-          <p className="eyebrow flex items-center gap-1.5">
-            <CheckCircle2 className="h-3.5 w-3.5 text-[var(--teal)]" />
-            Cascade Execution Complete
-          </p>
-          <h1 className="mt-2 font-display text-3xl font-semibold text-[var(--navy)] sm:text-4xl">
-            MINpred prediction ledger
+          <h1 className="font-display text-2xl font-bold tracking-tight text-[var(--navy)] sm:text-[1.68rem]">
+            MINpred Prediction Report
           </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[var(--muted)]">
-            Phase-resolved probabilities, functional enzyme classes, four-digit EC assignments, and
-            on-demand S4PRED / 3D structural models.
+          <p className="mt-1 text-[15px] text-[var(--ink-secondary)]">
+            Phase probabilities, enzyme classes, four-digit EC assignments &amp; structure models
           </p>
         </div>
-        <Link href="/prediction" className="btn-outline-sharp mt-4 sm:mt-0">
+        <Link href="/prediction" className="btn-outline-sharp shrink-0">
           New Prediction →
         </Link>
       </header>
@@ -411,35 +408,35 @@ export default function ResultsPage() {
       {error && (
         <div
           role="alert"
-          className="border-l-4 border-[var(--danger)] bg-[var(--danger-soft)] p-3.5 text-sm font-semibold text-[var(--danger)]"
+          className="rounded-xl border border-red-200 bg-[var(--danger-soft)] p-4 text-sm font-semibold text-[var(--danger)]"
         >
           {error}
         </div>
       )}
 
-      <section className="grid gap-4 border-y border-[var(--line)] bg-[var(--surface)] px-4 py-3.5 sm:grid-cols-[minmax(0,1fr)_auto]">
+      <section className="grid gap-4 rounded-xl border border-[var(--line-strong)] bg-[var(--surface)] px-5 py-4 sm:grid-cols-[minmax(0,1fr)_auto]">
         <div>
-          <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-[var(--ochre)]">
+          <p className="font-mono text-xs font-bold uppercase tracking-wider text-[var(--ochre)]">
             Job Identifier
           </p>
-          <p className="mt-0.5 truncate font-mono text-xs font-semibold text-[var(--navy)]">
+          <p className="mt-0.5 truncate font-mono text-sm font-bold text-[var(--navy)]">
             {data.jobId}
           </p>
         </div>
         <div className="sm:text-right">
-          <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-[var(--teal)]">
+          <p className="font-mono text-xs font-bold uppercase tracking-wider text-[var(--teal)]">
             Private Link Retention
           </p>
-          <p className="mt-0.5 font-mono text-xs font-semibold text-[var(--ink)]">
+          <p className="mt-0.5 font-mono text-sm font-bold text-[var(--ink)]">
             {expiry ? `Until ${expiry.toLocaleDateString()}` : '30 days'}
           </p>
         </div>
       </section>
 
-      <section className="surface">
+      <section className="surface overflow-hidden">
         <nav
           aria-label="Result phases"
-          className="flex overflow-x-auto border-b border-[var(--line)] bg-[var(--surface)] px-2 sm:px-4"
+          className="flex gap-2 overflow-x-auto border-b border-[var(--line-strong)] bg-[var(--surface)] p-3"
         >
           {files.map((file) => {
             const [label, title] = meta(file);
@@ -449,16 +446,16 @@ export default function ResultsPage() {
                 key={file}
                 type="button"
                 onClick={() => setActive(file)}
-                className={`min-w-40 border-b-[3px] px-4 py-3.5 text-left transition ${
+                className={`min-w-44 cursor-pointer rounded-lg border px-4 py-3 text-left transition ${
                   isActive
-                    ? 'border-[var(--ochre)] bg-white text-[var(--navy)]'
-                    : 'border-transparent text-[var(--muted)] hover:text-[var(--navy)]'
+                    ? 'border-2 border-[var(--navy)] bg-white text-[var(--navy)]'
+                    : 'border-[var(--line-strong)] bg-white text-[var(--ink)] hover:border-[var(--teal)]'
                 }`}
               >
-                <span className="font-mono text-[11px] font-extrabold uppercase tracking-wider text-[var(--ochre)]">
+                <span className="font-mono text-xs font-extrabold uppercase tracking-wider text-[var(--ochre)]">
                   {label}
                 </span>
-                <span className="mt-0.5 block text-sm font-bold">{title}</span>
+                <span className="mt-0.5 block text-sm font-bold text-[var(--navy)]">{title}</span>
               </button>
             );
           })}
@@ -473,11 +470,11 @@ export default function ResultsPage() {
             >
               {meta(active)[1]}
             </h2>
-            <p className="mt-1.5 max-w-3xl text-xs leading-relaxed text-[var(--muted)]">
+            <p className="mt-1 max-w-3xl text-sm leading-relaxed text-[var(--ink-secondary)]">
               {interpretation(active)}
             </p>
             <div className="probability-key mt-3" aria-label="Probability rank key">
-              <span className="probability-key-title">Probability rank (%)</span>
+              <span className="probability-key-title">Probability rank (%):</span>
               <span>
                 <i className="probability-dot probability-dot-1" />1 Highest
               </span>
@@ -493,23 +490,23 @@ export default function ResultsPage() {
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
-              className="btn-outline-sharp !min-h-0 !py-1.5 !px-3 !text-xs"
+              className="btn-outline-sharp py-2 px-3.5 text-sm"
               onClick={() => save(tsv(rows), active)}
             >
-              <Download className="h-3.5 w-3.5" />
+              <Download className="h-4 w-4" />
               TSV
             </button>
             <button
               type="button"
-              className="btn-outline-sharp !min-h-0 !py-1.5 !px-3 !text-xs"
+              className="btn-outline-sharp py-2 px-3.5 text-sm"
               onClick={() => save(csv(rows), active.replace(/\.tsv$/, '.csv'), 'text/csv')}
             >
-              <Download className="h-3.5 w-3.5" />
+              <Download className="h-4 w-4" />
               CSV
             </button>
             <button
               type="button"
-              className="btn-outline-sharp !min-h-0 !py-1.5 !px-3 !text-xs"
+              className="btn-outline-sharp py-2 px-3.5 text-sm"
               onClick={() =>
                 save(
                   JSON.stringify(rows, null, 2),
@@ -518,7 +515,7 @@ export default function ResultsPage() {
                 )
               }
             >
-              <Download className="h-3.5 w-3.5" />
+              <Download className="h-4 w-4" />
               JSON
             </button>
           </div>
@@ -540,7 +537,7 @@ export default function ResultsPage() {
                       <th
                         key={h}
                         scope="col"
-                        className="max-w-36 border-b border-[var(--line-strong)] px-3.5 py-3 font-mono text-xs font-bold tracking-wide text-[var(--navy)]"
+                        className="max-w-40 border-b border-[var(--line-strong)] px-4 py-3 font-mono text-xs font-bold tracking-wide text-[var(--navy)]"
                         title={abbreviation ? h : undefined}
                       >
                         {abbreviation ? (
@@ -556,7 +553,7 @@ export default function ResultsPage() {
                 {bookmark && (
                   <th
                     scope="col"
-                    className="border-b border-[var(--line-strong)] px-3.5 py-3 font-mono text-xs font-bold tracking-wide text-[var(--navy)]"
+                    className="border-b border-[var(--line-strong)] px-4 py-3 font-mono text-xs font-bold tracking-wide text-[var(--navy)]"
                   >
                     Structure
                   </th>
@@ -564,7 +561,7 @@ export default function ResultsPage() {
                 {isPhase4 && (
                   <th
                     scope="col"
-                    className="border-b border-[var(--line-strong)] px-3.5 py-3 font-mono text-xs font-bold tracking-wide text-[var(--navy)]"
+                    className="border-b border-[var(--line-strong)] px-4 py-3 font-mono text-xs font-bold tracking-wide text-[var(--navy)]"
                   >
                     Annotation
                   </th>
@@ -590,7 +587,7 @@ export default function ResultsPage() {
                           <th
                             key={h}
                             scope="row"
-                            className="max-w-52 border-b border-[var(--line)] px-3.5 py-3 font-mono text-xs font-bold break-words text-[var(--navy)]"
+                            className="max-w-56 border-b border-[var(--line)] px-4 py-3 font-mono text-sm font-bold break-words text-[var(--navy)]"
                             title={String(row[h] ?? '')}
                           >
                             {cellText}
@@ -601,7 +598,7 @@ export default function ResultsPage() {
                       return (
                         <td
                           key={h}
-                          className={`max-w-52 border-b border-[var(--line)] px-3.5 py-3 text-xs break-words font-medium ${
+                          className={`max-w-56 border-b border-[var(--line)] px-4 py-3 text-sm break-words font-medium text-[var(--ink)] ${
                             probabilityRank
                               ? `probability-rank probability-rank-${probabilityRank}`
                               : ''
@@ -621,10 +618,10 @@ export default function ResultsPage() {
                       );
                     })}
                     {bookmark && (
-                      <td className="border-b border-[var(--line)] px-3.5 py-3 text-xs whitespace-nowrap">
+                      <td className="border-b border-[var(--line)] px-4 py-3 text-sm whitespace-nowrap">
                         <button
                           type="button"
-                          className="mr-3 font-mono font-bold text-[var(--navy)] underline decoration-[var(--navy)]/40 underline-offset-2 hover:text-[var(--ochre)]"
+                          className="mr-3 cursor-pointer font-mono font-bold text-[var(--navy)] underline decoration-[var(--navy)]/40 underline-offset-2 hover:text-[var(--ochre)]"
                           disabled={Boolean(structureBusy)}
                           onClick={() => void openStructure('secondary', id)}
                         >
@@ -638,7 +635,7 @@ export default function ResultsPage() {
                         </button>
                         <button
                           type="button"
-                          className="font-mono font-bold text-[var(--teal)] underline decoration-[var(--teal)]/40 underline-offset-2 hover:text-[var(--ochre)]"
+                          className="cursor-pointer font-mono font-bold text-[var(--teal)] underline decoration-[var(--teal)]/40 underline-offset-2 hover:text-[var(--ochre)]"
                           disabled={Boolean(structureBusy)}
                           onClick={() => void openStructure('tertiary', id)}
                         >
@@ -653,7 +650,7 @@ export default function ResultsPage() {
                       </td>
                     )}
                     {isPhase4 && (
-                      <td className="border-b border-[var(--line)] px-3.5 py-3 font-mono text-xs whitespace-nowrap">
+                      <td className="border-b border-[var(--line)] px-4 py-3 font-mono text-sm whitespace-nowrap">
                         {links(ec).map(([label, url]) => (
                           <a
                             key={label}
@@ -663,7 +660,7 @@ export default function ResultsPage() {
                             className="mr-3 inline-flex items-center gap-0.5 font-bold text-[var(--navy)] hover:text-[var(--ochre)] hover:underline"
                           >
                             {label}
-                            <ExternalLink className="h-3 w-3" />
+                            <ExternalLink className="h-3.5 w-3.5" />
                           </a>
                         ))}
                       </td>
@@ -677,14 +674,14 @@ export default function ResultsPage() {
 
         {active.includes('Phase_3') && (
           <div className="border-t border-[var(--line)] bg-[var(--surface)] px-5 py-4">
-            <p className="font-mono text-[11px] font-extrabold uppercase tracking-wider text-[var(--navy)]">
+            <p className="font-mono text-xs font-extrabold uppercase tracking-wider text-[var(--navy)]">
               Phase III Class Abbreviations
             </p>
-            <dl className="mt-2.5 grid gap-x-6 gap-y-1.5 text-xs sm:grid-cols-2 lg:grid-cols-5">
+            <dl className="mt-2.5 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2 lg:grid-cols-5">
               {Object.entries(phase3Abbreviations).map(([name, abbreviation]) => (
-                <div key={name} className="grid grid-cols-[2.3rem_1fr] gap-1.5">
+                <div key={name} className="grid grid-cols-[2.6rem_1fr] gap-1.5">
                   <dt className="font-mono font-extrabold text-[var(--ochre)]">{abbreviation}</dt>
-                  <dd className="text-[var(--muted)]">{name}</dd>
+                  <dd className="text-[var(--ink)]">{name}</dd>
                 </div>
               ))}
             </dl>

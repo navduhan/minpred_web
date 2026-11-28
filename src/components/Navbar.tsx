@@ -3,15 +3,16 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ArrowRight, Menu } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { withBasePath } from '@/lib/base-path';
 
 const NAV_LINKS = [
-  { num: '01', name: 'Overview', href: '/' },
-  { num: '02', name: 'Predict', href: '/prediction' },
-  { num: '03', name: 'Standalone CLI', href: '/download' },
-  { num: '04', name: 'Manual', href: '/help' },
+  { name: 'Overview', href: '/' },
+  { name: 'Predict', href: '/prediction' },
+  { name: 'EC Numbers', href: '/ec-numbers' },
+  { name: 'CLI Package', href: '/download' },
+  { name: 'Guide', href: '/help' },
 ] as const;
 
 export default function Navbar() {
@@ -103,23 +104,21 @@ export default function Navbar() {
   };
 
   return (
-    <header ref={headerRef} className="site-header">
-      {/* Tier 1: Warm Limestone Institutional Affiliation Bar */}
+    <header ref={headerRef} className="site-header is-wide">
+      {/* Tier 1: Institutional Bar */}
       <div className="inst-bar hidden sm:block">
-        <div className="mx-auto flex h-8 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-          <p className="truncate font-mono text-[11px] font-semibold tracking-wide text-[var(--muted)]">
-            <span className="font-bold text-[var(--navy)]">UTAH STATE UNIVERSITY</span>
-            {' · '}
-            <span>DEPT. OF PLANTS, SOILS &amp; CLIMATE</span>
-            {' · '}
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-1.5 text-[13px] font-medium text-[var(--ink-secondary)] sm:px-6 lg:px-8">
+          <p className="truncate">
             <a
               href="https://kaabil.net"
               target="_blank"
               rel="noreferrer"
               className="font-bold text-[var(--teal)] hover:underline"
             >
-              KAABiL LAB
+              KAABiL
             </a>
+            {' · '}
+            <span>Kaundal Bioinformatics Laboratory · Utah State University</span>
           </p>
 
           <div className="flex shrink-0 items-center gap-4">
@@ -153,75 +152,65 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Tier 2: Crisp Editorial Monograph Masthead & Numbered Index Navigation */}
+      {/* Tier 2: Main Navigation Row */}
       <div
         ref={innerRef}
-        className="header-inner mx-auto flex h-[58px] max-w-7xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8"
+        className="header-inner mx-auto flex h-[62px] max-w-7xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8"
       >
-        <Link href="/" className="flex items-baseline gap-3" aria-label="MINpred home">
-          <span className="font-display text-2xl font-bold tracking-tight text-[var(--navy)]">
-            MINpred
+        <Link href="/" className="group flex items-center gap-3 text-[var(--ink)] no-underline" aria-label="MINpred home">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--navy)] font-mono text-sm font-extrabold text-[var(--pyrite)]">
+            MP
           </span>
-          <span className="hidden border-l border-[var(--line-strong)] pl-3 font-mono text-[11px] font-bold uppercase tracking-wider text-[var(--teal)] md:inline">
-            Soil N-Mineralization EC Atlas
-          </span>
+          <div className="leading-tight">
+            <span className="block font-display text-xl font-bold tracking-tight text-[var(--navy)] group-hover:text-[var(--teal)]">
+              MINpred
+            </span>
+            <span className="block text-[13.5px] font-medium text-[var(--ink-secondary)]">
+              Soil Nitrogen-Mineralization Enzyme Prediction
+            </span>
+          </div>
         </Link>
 
-        <div className="flex h-full items-center gap-4">
-          <nav className="site-nav flex h-full items-center" aria-label="Primary">
-            <button
-              className="menu-button inline-flex items-center gap-1.5 rounded-[2px] border border-[var(--navy)] bg-white px-3 py-1.5 text-xs font-bold text-[var(--navy)] hover:bg-[var(--limestone)]"
-              type="button"
-              onClick={handleMenuTriggerClick}
-              {...({
-                popovertarget: 'minpred-site-menu',
-                popovertargetaction: 'toggle',
-              } as Record<string, string>)}
-              aria-controls="minpred-site-menu"
-            >
-              <Menu className="h-4 w-4" aria-hidden="true" />
-              <span>Menu</span>
-            </button>
-
-            <ul
-              ref={menuRef}
-              id="minpred-site-menu"
-              className="site-menu"
-              data-fallback-open={fallbackOpen ? 'true' : undefined}
-              {...({ popover: 'auto' } as Record<string, string>)}
-            >
-              {NAV_LINKS.map(({ num, name, href }) => {
-                const active =
-                  href === '/'
-                    ? pathname === '/'
-                    : pathname === href || pathname?.startsWith(`${href}/`);
-                return (
-                  <li key={href} className="flex items-stretch">
-                    <Link
-                      href={href}
-                      aria-current={active ? 'page' : undefined}
-                      className="mp-nav-link"
-                      onClick={closeMobileMenu}
-                    >
-                      <span className="font-mono text-[11px] font-bold text-[var(--ochre)]">
-                        {num}
-                      </span>
-                      <span>{name}</span>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
-
-          <Link
-            href="/prediction"
-            className="btn-amber hidden !min-h-0 !py-1.5 !px-3.5 !text-xs sm:inline-flex"
+        <nav className="site-nav flex h-full items-center" aria-label="Primary">
+          <button
+            className="menu-button inline-flex items-center gap-1.5 rounded-lg border border-[var(--line-strong)] bg-white px-3.5 py-2 text-sm font-semibold text-[var(--navy)] hover:border-[var(--teal)] hover:bg-[var(--limestone)]"
+            type="button"
+            onClick={handleMenuTriggerClick}
+            popoverTarget="minpred-site-menu"
+            popoverTargetAction="toggle"
+            aria-controls="minpred-site-menu"
           >
-            <span>Predict FASTA</span>
-            <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-          </Link>
-        </div>
+            <Menu className="h-4 w-4" aria-hidden="true" />
+            <span>Menu</span>
+          </button>
+
+          <ul
+            ref={menuRef}
+            id="minpred-site-menu"
+            className="site-menu"
+            data-fallback-open={fallbackOpen ? 'true' : undefined}
+            {...({ popover: 'auto' } as Record<string, string>)}
+          >
+            {NAV_LINKS.map(({ name, href }) => {
+              const active =
+                href === '/'
+                  ? pathname === '/'
+                  : pathname === href || pathname?.startsWith(`${href}/`);
+              return (
+                <li key={href} className="flex items-center">
+                  <Link
+                    href={href}
+                    aria-current={active ? 'page' : undefined}
+                    className="mp-nav-link"
+                    onClick={closeMobileMenu}
+                  >
+                    <span>{name}</span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
       </div>
     </header>
   );

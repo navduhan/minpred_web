@@ -41,21 +41,21 @@ export default function CatalyticMechanismSVG({
 
   return (
     <div className="w-full">
-      <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2 font-mono text-[11px] text-[var(--muted)]">
+      <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2 font-mono text-xs font-semibold text-[var(--ink-secondary)]">
         <span>{mode === 'amide' ? 'Amide Substrate' : 'NH₃⁺ (N-term)'}</span>
-        <span className="font-semibold text-[var(--navy)]">{compartment}</span>
+        <span className="font-bold text-[var(--navy)]">{compartment}</span>
         <span>{mode === 'amide' ? 'Mineralized Product' : 'COO⁻ (C-term)'}</span>
       </div>
 
       <svg
         viewBox="0 0 560 88"
-        className="block w-full select-none border border-[var(--line)] bg-white"
+        className="block w-full rounded-lg border border-[var(--line-strong)] bg-white"
         role="img"
         aria-label={`Scissile bond schematic: ${cofactorOrDyad} yielding ${productLabel}`}
       >
         {mode === 'amide' ? (
           <g>
-            <rect x="24" y={midY - 14} width="126" height="28" rx="2" fill={BASALT} />
+            <rect x="24" y={midY - 14} width="126" height="28" rx="6" fill={BASALT} />
             <text
               x="87"
               y={midY + 4}
@@ -76,7 +76,7 @@ export default function CatalyticMechanismSVG({
               y={midY - 14}
               width="66"
               height="28"
-              rx="2"
+              rx="6"
               fill={PYRITE}
               stroke={BASALT}
               strokeWidth="1.2"
@@ -107,7 +107,7 @@ export default function CatalyticMechanismSVG({
               + H₂O
             </text>
 
-            <rect x="388" y={midY - 14} width="74" height="28" rx="2" fill={STEEL} />
+            <rect x="388" y={midY - 14} width="74" height="28" rx="6" fill={STEEL} />
             <text
               x="425"
               y={midY + 4}
@@ -245,7 +245,7 @@ export default function CatalyticMechanismSVG({
 
             {['P₁′', 'P₂′', 'P₃′', 'P₄′'].map((lbl, idx) => (
               <g key={lbl} transform={`translate(${192 + idx * 80}, ${midY - 5})`}>
-                <rect width="64" height="26" rx="2" fill={idx === 0 ? VERDIGRIS : BASALT} />
+                <rect width="64" height="26" rx="6" fill={idx === 0 ? VERDIGRIS : BASALT} />
                 <text
                   x="32"
                   y="17"
@@ -328,7 +328,7 @@ export default function CatalyticMechanismSVG({
                           y={midY - 13}
                           width={blockW}
                           height="26"
-                          rx={res.darkText ? '13' : '2'}
+                          rx={res.darkText ? '13' : '6'}
                           fill={res.fill}
                           stroke={res.darkText ? BASALT : 'none'}
                           strokeWidth={res.darkText ? '1.3' : '0'}

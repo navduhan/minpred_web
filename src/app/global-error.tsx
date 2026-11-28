@@ -44,27 +44,28 @@ export default function GlobalError({
           style={{
             maxWidth: '36rem',
             margin: '0 auto',
-            border: '1px solid #d6d3c9',
-            borderTop: '3px solid #142a2c',
+            border: '1px solid #adb5ae',
+            borderRadius: '0.875rem',
             padding: '2rem',
           }}
         >
-          <h1 style={{ fontSize: '1.35rem', margin: '0 0 0.75rem', color: '#142a2c' }}>
+          <h1 style={{ fontSize: '1.35rem', margin: '0 0 0.75rem', color: '#122628' }}>
             MINpred was updated — please reload
           </h1>
-          <p style={{ fontSize: '0.9rem', lineHeight: 1.55, color: '#4f6162', margin: '0 0 1.25rem' }}>
+          <p style={{ fontSize: '0.975rem', lineHeight: 1.6, color: '#182c2e', margin: '0 0 1.25rem' }}>
             This browser tab cached an earlier page version before the latest deployment. Reloading
             loads the current build cleanly.
           </p>
-          <div style={{ display: 'flex', gap: '0.6rem' }}>
+          <div style={{ display: 'flex', gap: '0.65rem' }}>
             <button
               type="button"
               onClick={() => window.location.reload()}
               style={{
-                background: '#c58a17',
-                color: '#0c1b1d',
-                border: '1px solid #a8730e',
-                padding: '0.55rem 1rem',
+                background: '#eeb035',
+                color: '#0b181a',
+                border: '1px solid #a6710c',
+                borderRadius: '0.625rem',
+                padding: '0.6rem 1.15rem',
                 fontWeight: 700,
                 cursor: 'pointer',
               }}
@@ -76,9 +77,10 @@ export default function GlobalError({
               onClick={() => reset()}
               style={{
                 background: '#ffffff',
-                color: '#142a2c',
-                border: '1px solid #142a2c',
-                padding: '0.55rem 1rem',
+                color: '#122628',
+                border: '1px solid #adb5ae',
+                borderRadius: '0.625rem',
+                padding: '0.6rem 1.15rem',
                 fontWeight: 700,
                 cursor: 'pointer',
               }}

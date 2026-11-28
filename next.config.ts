@@ -1,4 +1,8 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import type { NextConfig } from "next";
+
+const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
 const isDevelopment = process.env.NODE_ENV === "development";
 const developmentEval = isDevelopment ? " 'unsafe-eval'" : "";
@@ -49,7 +53,7 @@ const nextConfig: NextConfig = {
     ];
   },
   turbopack: {
-    root: process.cwd(),
+    root: projectRoot,
   },
 };
 

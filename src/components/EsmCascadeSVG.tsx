@@ -40,9 +40,9 @@ export default function EsmCascadeSVG({
   return (
     <svg
       viewBox="0 0 820 278"
-      className="block w-full select-none bg-white"
+      className="block w-full bg-white"
       role="img"
-      aria-label="MINpred computational cascade: overlap-averaged 1,022-residue sliding windows into 1,280-D ESM-2 embeddings, Gate I enzyme filter, Gate II mineralization filter, and Gate III/IV 10-class EC specialist heads"
+      aria-label="MINpred computational cascade: overlap-averaged 1,022-residue sliding windows into 1,280-D ESM-2 embeddings, Phase I enzyme filter, Phase II mineralization filter, and Phase III/IV 10-class EC specialist heads"
     >
       {/* STAGE A: LONG POLYPEPTIDE & OVERLAPPING 1,022-AA WINDOWS */}
       <g aria-hidden="true">
@@ -55,20 +55,20 @@ export default function EsmCascadeSVG({
         <text
           x="18"
           y="48"
-          fontSize="9.5"
+          fontSize="10"
           fontWeight="800"
-          fill="#4f6162"
+          fill={BASALT}
           fontFamily="ui-monospace, SFMono-Regular, monospace"
         >
           FASTA (UP TO 5,000 AA)
         </text>
 
-        <rect x="18" y="88" width="84" height="16" rx="2" fill={BASALT} />
+        <rect x="18" y="88" width="84" height="17" rx="4" fill={BASALT} />
         <text
           x="60"
-          y="99.5"
+          y="100"
           textAnchor="middle"
-          fontSize="8.5"
+          fontSize="8.8"
           fontWeight="800"
           fill="#ffffff"
           fontFamily="ui-monospace, SFMono-Regular, monospace"
@@ -78,12 +78,12 @@ export default function EsmCascadeSVG({
         <polyline points="102,96 170,96 170,82 188,82" fill="none" stroke={BASALT} strokeWidth="1.6" />
         <polygon points="186,78.5 193,82 186,85.5" fill={BASALT} />
 
-        <rect x="42" y="114" width="84" height="16" rx="2" fill={VERDIGRIS} />
+        <rect x="42" y="114" width="84" height="17" rx="4" fill={VERDIGRIS} />
         <text
           x="84"
-          y="125.5"
+          y="126"
           textAnchor="middle"
-          fontSize="8.5"
+          fontSize="8.8"
           fontWeight="800"
           fill="#ffffff"
           fontFamily="ui-monospace, SFMono-Regular, monospace"
@@ -93,12 +93,12 @@ export default function EsmCascadeSVG({
         <line x1="126" y1="122" x2="188" y2="122" stroke={VERDIGRIS} strokeWidth="1.6" />
         <polygon points="186,118.5 193,122 186,125.5" fill={VERDIGRIS} />
 
-        <rect x="66" y="140" width="84" height="16" rx="2" fill={PYRITE} stroke={BASALT} strokeWidth="1" />
+        <rect x="66" y="140" width="84" height="17" rx="4" fill={PYRITE} stroke={BASALT} strokeWidth="1" />
         <text
           x="108"
-          y="151.5"
+          y="152"
           textAnchor="middle"
-          fontSize="8.5"
+          fontSize="8.8"
           fontWeight="800"
           fill="#0c1b1d"
           fontFamily="ui-monospace, SFMono-Regular, monospace"
@@ -117,9 +117,9 @@ export default function EsmCascadeSVG({
           x="86"
           y="182"
           textAnchor="middle"
-          fontSize="8.5"
+          fontSize="9"
           fontWeight="700"
-          fill="#4f6162"
+          fill={BASALT}
           fontFamily="ui-monospace, SFMono-Regular, monospace"
         >
           511-aa stride · mean pool
@@ -130,9 +130,9 @@ export default function EsmCascadeSVG({
         x="88"
         y="258"
         textAnchor="middle"
-        fontSize="9.5"
+        fontSize="10"
         fontWeight="800"
-        fill="#4f6162"
+        fill={BASALT}
         fontFamily="ui-monospace, SFMono-Regular, monospace"
       >
         01 · WINDOWED INPUT
@@ -163,9 +163,9 @@ export default function EsmCascadeSVG({
         x={gx + (gridDim * cellSize) / 2}
         y="258"
         textAnchor="middle"
-        fontSize="9.5"
+        fontSize="10"
         fontWeight="800"
-        fill="#4f6162"
+        fill={BASALT}
         fontFamily="ui-monospace, SFMono-Regular, monospace"
       >
         02 · ESM-2 650M (1,280-D)
@@ -199,32 +199,32 @@ export default function EsmCascadeSVG({
           </g>
         ))}
 
-        <rect x="412" y="28" width="20" height="196" rx="2" fill={BASALT} />
+        <rect x="412" y="28" width="20" height="196" rx="5" fill={BASALT} />
         <text
           x="422"
           y="126"
           textAnchor="middle"
-          fontSize="9"
+          fontSize="9.2"
           fontWeight="800"
           fill="#ffffff"
           fontFamily="ui-monospace, SFMono-Regular, monospace"
           transform="rotate(-90 422 126)"
         >
-          GATE I · ENZYME (0.954)
+          PHASE I · ENZYME SCREEN
         </text>
 
-        <rect x="474" y="28" width="20" height="196" rx="2" fill={VERDIGRIS} />
+        <rect x="474" y="28" width="20" height="196" rx="5" fill={VERDIGRIS} />
         <text
           x="484"
           y="126"
           textAnchor="middle"
-          fontSize="9"
+          fontSize="9.2"
           fontWeight="800"
           fill="#ffffff"
           fontFamily="ui-monospace, SFMono-Regular, monospace"
           transform="rotate(-90 484 126)"
         >
-          GATE II · N-MIN (0.936)
+          PHASE II · N-MIN FILTER
         </text>
       </g>
 
@@ -232,12 +232,12 @@ export default function EsmCascadeSVG({
         x="452"
         y="258"
         textAnchor="middle"
-        fontSize="9.5"
+        fontSize="10"
         fontWeight="800"
-        fill="#4f6162"
+        fill={BASALT}
         fontFamily="ui-monospace, SFMono-Regular, monospace"
       >
-        03 · GATES I–II (&lt;40% ID)
+        03 · BINARY FILTERS (I–II)
       </text>
 
       {/* STAGE D: GATE III 10-CLASS ROUTER & GATE IV EC HEADS */}
@@ -300,16 +300,16 @@ export default function EsmCascadeSVG({
                 y="-8.5"
                 width="78"
                 height="17"
-                rx="2"
+                rx="5"
                 fill={active ? PYRITE : '#f5f2eb'}
-                stroke={active ? PYRITE_DARK : '#d6d3c9'}
+                stroke={active ? PYRITE_DARK : '#adb5ae'}
                 strokeWidth="1.2"
               />
               <text
                 x="761"
                 y="3.5"
                 textAnchor="middle"
-                fontSize="9.5"
+                fontSize="9.8"
                 fontWeight="800"
                 fill={active ? '#0c1b1d' : '#142a2c'}
                 fontFamily="ui-monospace, SFMono-Regular, monospace"
@@ -325,12 +325,12 @@ export default function EsmCascadeSVG({
         x="686"
         y="258"
         textAnchor="middle"
-        fontSize="9.5"
+        fontSize="10"
         fontWeight="800"
-        fill="#4f6162"
+        fill={BASALT}
         fontFamily="ui-monospace, SFMono-Regular, monospace"
       >
-        04 · GATES III–IV (52 ECs · 96.1%)
+        04 · PHASES III–IV (10 CLASSES · 52 ECs)
       </text>
     </svg>
   );

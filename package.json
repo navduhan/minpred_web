@@ -1,15 +1,15 @@
 {
   "name": "minpred_web",
   "version": "1.0.0",
-  "description": "MINpred secure web application and HPC prediction gateway",
+  "description": "MINpred web server for soil nitrogen-mineralization enzyme and EC prediction",
   "author": "Naveen Duhan",
   "license": "MIT",
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint ."
   },
   "dependencies": {
     "lucide-react": "^0.468.0",

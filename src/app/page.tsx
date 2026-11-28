@@ -39,55 +39,36 @@ const PATHWAY_STAGES: ReadonlyArray<{
   },
 ];
 
-const GATE_SUMMARY = [
+const PHASE_SUMMARY = [
   {
-    gate: 'Gate I',
-    title: 'Catalytic Enzyme Screen',
-    cutoff: '<40% seq id',
-    acc: '97.7%',
-    mcc: '0.954',
+    phase: 'Phase I',
+    title: 'Enzyme Screen',
+    output: 'Enzyme vs. Non-enzyme',
     detail:
-      'Separates 233,358 EC-annotated enzymes from 135,425 DIAMOND-decontaminated strict non-enzymes.',
+      'Classifies submitted protein or ORF sequences and passes predicted enzymes to Phase II.',
   },
   {
-    gate: 'Gate II',
+    phase: 'Phase II',
     title: 'N-Mineralization Filter',
-    cutoff: '<40% seq id',
-    acc: '99.1%',
-    mcc: '0.936',
+    output: 'N-Mineralization vs. Other',
     detail:
-      'Isolates 11,187 target N-mineralization hydrolases against 222,170 other EC enzymes (incl. EC 3.4/3.5 controls).',
+      'Isolates nitrogen-mineralization hydrolases from non-mineralization enzymes.',
   },
   {
-    gate: 'Gate III',
-    title: '10-Class Functional Router',
-    cutoff: '<60% seq id',
-    acc: '97.9%',
-    mcc: '0.975',
+    phase: 'Phase III',
+    title: '10-Class Router',
+    output: 'SEP … AH (10 classes)',
     detail:
-      'Assigns qualifying proteins across nine EC 3.4 peptidase subclasses and EC 3.5.1 linear C–N amidohydrolases.',
+      'Assigns qualifying enzymes across nine EC 3.4 peptidase classes and EC 3.5.1 amidohydrolases.',
   },
   {
-    gate: 'Gate IV',
+    phase: 'Phase IV',
     title: 'Specialist EC Heads (M1–M10)',
-    cutoff: '<60% seq id',
-    acc: '96.1%',
-    mcc: '0.955',
+    output: '52 4-Digit ECs + Others',
     detail:
-      'Routes each sequence to its dedicated class-specific predictor covering 52 explicit four-digit ECs + Others.',
+      'Routes each enzyme to its class-specific model for four-digit EC prediction.',
   },
 ] as const;
-
-const ALL_EXPLICIT_ECS = MINERALIZATION_CLASSES.flatMap((cls) =>
-  cls.ecs.map((ec) => ({
-    ec,
-    classKey: cls.key,
-    code: cls.code,
-    classId: cls.classId,
-    className: cls.name,
-    stageShort: cls.stageShort,
-  })),
-);
 
 const CLI_SNIPPET = `git clone https://github.com/usubioinfo/minpred.git
 cd minpred && uv sync --python 3.12
@@ -103,25 +84,11 @@ const BIBTEX = `@software{Duhan2026MINpred,
 
 export default function HomePage() {
   const [selectedKey, setSelectedKey] = useState<DemoSequenceKey>('serine');
-  const [highlightedEc, setHighlightedEc] = useState<string>('3.4.21.62');
   const [copiedBib, setCopiedBib] = useState(false);
   const [copiedCli, setCopiedCli] = useState(false);
 
   const activeClass: MineralizationClassInfo =
     MINERALIZATION_CLASSES.find((item) => item.key === selectedKey) ?? MINERALIZATION_CLASSES[0];
-
-  const handleSelectClass = (key: DemoSequenceKey) => {
-    setSelectedKey(key);
-    const found = MINERALIZATION_CLASSES.find((item) => item.key === key);
-    if (found && !found.ecs.includes(highlightedEc)) {
-      setHighlightedEc(found.ecs[0]);
-    }
-  };
-
-  const handleSelectEcTile = (classKey: DemoSequenceKey, ec: string) => {
-    setSelectedKey(classKey);
-    setHighlightedEc(ec);
-  };
 
   const copyBibtex = async () => {
     try {
@@ -129,7 +96,7 @@ export default function HomePage() {
       setCopiedBib(true);
       window.setTimeout(() => setCopiedBib(false), 2200);
     } catch {
-      // Clipboard unavailable in restricted contexts
+      // Clipboard unavailable
     }
   };
 
@@ -139,86 +106,71 @@ export default function HomePage() {
       setCopiedCli(true);
       window.setTimeout(() => setCopiedCli(false), 2200);
     } catch {
-      // Clipboard unavailable in restricted contexts
+      // Clipboard unavailable
     }
   };
 
   return (
-    <div className="bg-white pb-6">
-      {/* ==================== SECTION 1: MONOGRAPH HERO + 4-STAT LEDGER + SOIL CUTAWAY SVG ==================== */}
-      <section aria-labelledby="home-monograph-title" className="pt-6 sm:pt-8">
-        <div className="grid gap-6 pb-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
-          <div className="space-y-3">
-            <span className="inline-block border-l-[3px] border-[var(--teal)] bg-[var(--teal-soft)] px-2.5 py-1 font-mono text-[11px] font-bold uppercase tracking-wider text-[var(--teal)]">
-              Soil Organic Nitrogen Turnover · EC 3.4 Peptidases &amp; EC 3.5.1 Amidohydrolases
-            </span>
+    <div className="space-y-12 py-6 pb-10">
+      {/* ==================== SECTION 1: HEADER + PRACTICAL CAPABILITIES + INTERACTIVE PATHWAY ==================== */}
+      <section aria-labelledby="home-monograph-title" className="space-y-6">
+        <div className="flex flex-col justify-between gap-4 border-b border-[var(--line-strong)] pb-5 lg:flex-row lg:items-center">
+          <div className="min-w-0 space-y-1.5">
             <h1
               id="home-monograph-title"
-              className="font-display text-3xl font-bold leading-[1.1] text-[var(--navy)] sm:text-4xl lg:text-[2.55rem]"
+              className="font-display text-2xl font-bold tracking-tight text-[var(--navy)] sm:text-3xl"
             >
-              Hierarchical Enzyme Commission annotation for soil nitrogen mineralization.
+              MINpred:{' '}
+              <span className="text-[var(--teal)]">
+                Soil Nitrogen-Mineralization Enzyme &amp; EC Prediction
+              </span>
             </h1>
+            <p className="max-w-4xl text-base leading-7 text-[var(--ink)]">
+              Predicts 10 nitrogen-mineralization enzyme classes (EC 3.4 peptidases &amp; EC 3.5.1
+              amidohydrolases) and 52 four-digit EC numbers from protein or nucleotide FASTA
+              sequences using ESM-2 representations.
+            </p>
           </div>
 
-          <div className="space-y-4 lg:border-l lg:border-[var(--line)] lg:pl-6">
-            <p className="text-sm leading-relaxed text-[var(--muted)]">
-              Polymeric proteins and amides represent over 40% of surface soil organic nitrogen.
-              MINpred pairs overlap-averaged <strong>ESM-2 (650M)</strong> sequence representations
-              with <strong>13 regularized neural classifiers</strong> to resolve uncharacterized
-              sequences down to explicit four-digit EC numbers without alignment databases.
-            </p>
-            <div className="flex flex-wrap items-center gap-2.5">
-              <Link href="/prediction" className="btn-amber">
-                <span>Predict FASTA Sequences</span>
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </Link>
-              <Link href="/prediction?example=mixed" className="btn-outline-sharp">
-                <span>10-Class Benchmark</span>
-              </Link>
-              <Link
-                href="/download"
-                className="px-1.5 py-1 font-mono text-xs font-bold text-[var(--teal)] underline underline-offset-4 hover:text-[var(--navy)]"
-              >
-                Standalone CLI →
-              </Link>
-            </div>
+          <div className="shrink-0">
+            <Link href="/prediction" className="btn-amber py-3 px-6 text-base">
+              <span>Predict Sequences</span>
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
           </div>
         </div>
 
-        {/* 4-Stat Inline Monograph Rule Strip */}
-        <dl className="grid grid-cols-2 divide-x divide-y divide-[var(--line)] border-y-2 border-[var(--navy)] bg-[var(--limestone)] lg:grid-cols-4 lg:divide-y-0">
+        {/* Rounded 4-Capability Summary Row (Server Capabilities Only) */}
+        <dl className="grid grid-cols-2 divide-x divide-y divide-[var(--line)] overflow-hidden rounded-xl border border-[var(--line-strong)] bg-[var(--limestone)] lg:grid-cols-4 lg:divide-y-0">
           {[
-            ['457,321', 'Swiss-Prot 2026_04 QC sequences', '135,425 decontaminated non-enzymes'],
-            ['13 Neural Heads', 'Bundled .keras + .npz weights', 'Gates I–III + M1–M10 specialists'],
-            ['10 Classes · 52 ECs', 'Explicit four-digit IUBMB scope', 'Plus class-conditional Others'],
-            ['0.936–0.975 MCC', 'Homology-disjoint test splits', '5 single-linkage super-cluster seeds'],
+            ['10 Classes', 'Enzyme Categories', '9 EC 3.4 peptidases & EC 3.5.1'],
+            ['52 Explicit ECs', 'Four-Digit EC Coverage', 'Plus class-specific Others'],
+            ['4 Phases', 'Prediction Cascade', 'ESM-2 (1,280-D) + 13 neural heads'],
+            ['Protein & DNA/RNA', 'Supported Inputs', 'FASTA, file upload & accession IDs'],
           ].map(([val, label, note]) => (
-            <div key={label} className="px-4 py-3.5 sm:px-5">
-              <dt className="font-mono text-[11px] font-bold uppercase tracking-wider text-[var(--muted)]">
+            <div key={label} className="px-4 py-4 sm:px-5">
+              <dt className="font-mono text-xs font-bold uppercase tracking-wider text-[var(--ink-secondary)]">
                 {label}
               </dt>
-              <dd className="mt-0.5 font-display text-2xl font-bold text-[var(--navy)]">{val}</dd>
-              <p className="font-mono text-[11px] text-[var(--teal)]">{note}</p>
+              <dd className="mt-1 font-display text-2xl font-bold text-[var(--navy)]">{val}</dd>
+              <p className="mt-0.5 text-sm font-medium text-[var(--teal)]">{note}</p>
             </div>
           ))}
         </dl>
 
-        {/* Full-Width Interactive Soil-to-Root Mineralization Cutaway SVG */}
-        <figure className="border-b border-[var(--line)] bg-white pt-3 pb-2">
-          <div className="mb-2 flex flex-col justify-between gap-1 text-xs sm:flex-row sm:items-center">
-            <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-[var(--navy)]">
-              Interactive Rhizosphere Nitrogen-Mineralization Cutaway
-            </span>
-            <span className="text-xs text-[var(--muted)]">
-              Click any enzyme complex in the figure—or choose from the 3 reaction steps below—to
-              inspect its active-site cleavage.
-            </span>
-          </div>
-          <SoilMineralizationCutawaySVG selected={selectedKey} onSelect={handleSelectClass} />
-        </figure>
+        {/* Rounded Interactive Pathway Container */}
+        <div className="overflow-hidden rounded-2xl border border-[var(--line-strong)] bg-white shadow-[0_2px_12px_rgba(18,38,40,0.04)]">
+          {/* Cutaway Header & SVG */}
+          <figure className="border-b border-[var(--line)] bg-white p-4 sm:p-5">
+            <div className="mb-3 flex flex-col justify-between gap-1 sm:flex-row sm:items-center">
+              <span className="eyebrow">Soil Nitrogen-Mineralization Pathway</span>
+              <span className="text-sm font-medium text-[var(--ink-secondary)]">
+                Click any enzyme in the diagram or select a class below
+              </span>
+            </div>
+            <SoilMineralizationCutawaySVG selected={selectedKey} onSelect={setSelectedKey} />
+          </figure>
 
-        {/* ==================== 3-STAGE BIOCHEMICAL REACTION BAR + 3-COLUMN HORIZONTAL READOUT ==================== */}
-        <div className="border-x border-b-2 border-[var(--line)] border-b-[var(--navy)]">
           {/* 3 Biochemical Reaction Steps Grouping the 10 Classes */}
           <div
             className="grid divide-y divide-[var(--line)] border-b border-[var(--line)] bg-[var(--limestone)] md:grid-cols-3 md:divide-x md:divide-y-0"
@@ -231,19 +183,19 @@ export default function HomePage() {
               return (
                 <div
                   key={stage.id}
-                  className={`p-3.5 sm:p-4 ${stageActive ? 'bg-[var(--ochre-soft)]/70' : ''}`}
+                  className={`p-4 ${stageActive ? 'bg-[var(--ochre-soft)]' : ''}`}
                 >
-                  <div className="flex items-baseline justify-between gap-2">
-                    <span className="font-mono text-[11px] font-extrabold tracking-wider text-[var(--ochre)]">
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <span className="font-mono text-xs font-extrabold tracking-wider text-[var(--ochre)]">
                       {stage.stepNum}
                     </span>
-                    <span className="font-mono text-[10.5px] text-[var(--muted)]">
+                    <span className="font-mono text-xs font-semibold text-[var(--ink-secondary)]">
                       {stage.equation}
                     </span>
                   </div>
-                  <p className="mt-0.5 text-xs font-bold text-[var(--navy)]">{stage.title}</p>
+                  <p className="mt-1 text-[15px] font-bold text-[var(--navy)]">{stage.title}</p>
 
-                  <div className="mt-2.5 flex flex-wrap gap-1.5">
+                  <div className="mt-3 flex flex-wrap gap-2">
                     {stageClasses.map((cls) => {
                       const active = cls.key === selectedKey;
                       return (
@@ -251,17 +203,17 @@ export default function HomePage() {
                           key={cls.key}
                           type="button"
                           aria-pressed={active}
-                          onClick={() => handleSelectClass(cls.key)}
-                          className={`border px-2.5 py-1 font-mono text-xs font-extrabold transition ${
+                          onClick={() => setSelectedKey(cls.key)}
+                          className={`cursor-pointer rounded-lg border px-3 py-1.5 font-mono text-[13.5px] font-bold transition ${
                             active
                               ? 'border-[var(--navy)] bg-[var(--navy)] text-white'
-                              : 'border-[var(--line-strong)] bg-white text-[var(--navy)] hover:border-[var(--navy)] hover:bg-[var(--limestone)]'
+                              : 'border-[var(--line-strong)] bg-white text-[var(--navy)] hover:border-[var(--teal)] hover:bg-[var(--teal-soft)]'
                           }`}
                         >
                           <span>{cls.code}</span>
                           <span
-                            className={`ml-1.5 text-[10px] font-semibold ${
-                              active ? 'text-[#f5d07a]' : 'text-[var(--muted)]'
+                            className={`ml-1.5 text-xs font-semibold ${
+                              active ? 'text-[#f5d07a]' : 'text-[var(--teal)]'
                             }`}
                           >
                             {cls.ecs.length}
@@ -275,22 +227,19 @@ export default function HomePage() {
             })}
           </div>
 
-          {/* 3-Column Horizontal Specimen & Scissile-Bond Readout */}
+          {/* 3-Column Horizontal Class & Scissile-Bond Readout */}
           <div
             aria-live="polite"
             className="grid divide-y divide-[var(--line)] bg-white lg:grid-cols-12 lg:divide-x lg:divide-y-0"
           >
             {/* Col 1: Class Identity, Summary & Motifs */}
-            <div className="space-y-3 p-5 lg:col-span-4">
+            <div className="space-y-3.5 p-5 lg:col-span-4">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="bg-[var(--navy)] px-2 py-0.5 font-mono text-xs font-extrabold text-white">
+                <span className="rounded-md bg-[var(--navy)] px-2.5 py-1 font-mono text-xs font-bold text-white">
                   {activeClass.code} · {activeClass.classId}
                 </span>
-                <span className="font-mono text-xs font-bold text-[var(--teal)]">
+                <span className="font-mono text-sm font-bold text-[var(--teal)]">
                   {activeClass.ecPrefix}
-                </span>
-                <span className="font-mono text-[11px] text-[var(--muted)]">
-                  ({activeClass.proteins} seqs)
                 </span>
               </div>
 
@@ -298,22 +247,22 @@ export default function HomePage() {
                 {activeClass.name}
               </h2>
 
-              <p className="text-xs leading-relaxed text-[var(--ink)] sm:text-[13px]">
+              <p className="text-[15px] leading-relaxed text-[var(--ink)]">
                 {activeClass.summary}
               </p>
 
-              <div className="border-t border-[var(--line)] pt-2.5">
-                <p className="font-mono text-[10.5px] font-bold uppercase tracking-wider text-[var(--ochre)]">
+              <div className="border-t border-[var(--line)] pt-3">
+                <p className="font-mono text-xs font-bold uppercase tracking-wider text-[var(--ochre)]">
                   Diagnostic Active-Site Motifs
                 </p>
-                <ul className="mt-1.5 space-y-1">
+                <ul className="mt-2 space-y-1.5">
                   {activeClass.conservedMotifs.map((motif) => (
                     <li
                       key={motif}
-                      className="flex items-baseline gap-2 font-mono text-[11.5px] text-[var(--ink)]"
+                      className="flex items-baseline gap-2 font-mono text-[13px] text-[var(--ink)]"
                     >
                       <span
-                        className="inline-block h-1.5 w-1.5 shrink-0 bg-[var(--pyrite)]"
+                        className="inline-block h-2 w-2 shrink-0 rounded-sm bg-[var(--pyrite-indicator)]"
                         aria-hidden="true"
                       />
                       <span>{motif}</span>
@@ -324,10 +273,10 @@ export default function HomePage() {
             </div>
 
             {/* Col 2: Scissile-Bond Schematic SVG + Mechanism */}
-            <div className="flex flex-col justify-between space-y-3.5 p-5 lg:col-span-5">
-              <div className="space-y-2.5">
-                <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-[var(--navy)]">
-                  Scissile Bond &amp; Catalytic Cleavage Topology
+            <div className="flex flex-col justify-between space-y-4 p-5 lg:col-span-5">
+              <div className="space-y-3">
+                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[var(--navy)]">
+                  Scissile Bond &amp; Catalytic Cleavage
                 </span>
                 <CatalyticMechanismSVG
                   mode={activeClass.cleavageMode}
@@ -335,48 +284,49 @@ export default function HomePage() {
                   cofactorOrDyad={activeClass.cofactorOrDyad}
                   productLabel={activeClass.productLabel}
                 />
-                <p className="text-xs leading-relaxed text-[var(--muted)]">
+                <p className="text-[14.5px] leading-relaxed text-[var(--ink)]">
                   {activeClass.mechanism}
                 </p>
               </div>
 
-              <div className="border-t border-[var(--line)] pt-2.5">
-                <span className="font-mono text-[10.5px] font-bold uppercase tracking-wider text-[var(--teal)]">
-                  Representative Soil &amp; Microbial Exemplars:{' '}
+              <div className="border-t border-[var(--line)] pt-3 text-sm">
+                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[var(--teal)]">
+                  Representative Enzymes:{' '}
                 </span>
-                <span className="font-mono text-[11.5px] text-[var(--ink)]">
+                <span className="font-mono text-[13px] font-medium text-[var(--ink)]">
                   {activeClass.canonicalExamples.join(' · ')}
                 </span>
               </div>
             </div>
 
-            {/* Col 3: Held-Out Metrics, Explicit BRENDA Chips & Specimen Launcher */}
+            {/* Col 3: Reaction Product, Explicit EC Chips & Example Launcher */}
             <div className="flex flex-col justify-between space-y-4 bg-[var(--surface)] p-5 lg:col-span-3">
-              <div className="space-y-3.5">
-                <div className="grid grid-cols-2 divide-x divide-[var(--line)] border border-[var(--line)] bg-white text-center font-mono">
-                  <div className="py-2">
-                    <div className="text-[10px] font-bold uppercase text-[var(--muted)]">
-                      Test MCC
-                    </div>
-                    <div className="text-sm font-extrabold text-[var(--navy)]">
-                      {activeClass.mcc}
-                    </div>
+              <div className="space-y-4">
+                <div className="rounded-xl border border-[var(--line-strong)] bg-white p-3 font-mono">
+                  <div className="text-xs font-bold uppercase text-[var(--ink-secondary)]">
+                    Reaction Product
                   </div>
-                  <div className="py-2">
-                    <div className="text-[10px] font-bold uppercase text-[var(--muted)]">
-                      AUROC
-                    </div>
-                    <div className="text-sm font-extrabold text-[var(--teal)]">
-                      {activeClass.auroc}
-                    </div>
+                  <div className="mt-0.5 text-sm font-extrabold text-[var(--navy)]">
+                    {activeClass.productLabel}
+                  </div>
+                  <div className="mt-1 text-xs font-semibold text-[var(--teal)]">
+                    {activeClass.stageShort} · {activeClass.cofactorOrDyad}
                   </div>
                 </div>
 
                 <div>
-                  <p className="font-mono text-[10.5px] font-bold uppercase tracking-wider text-[var(--navy)]">
-                    Head {activeClass.modelHead} · {activeClass.ecs.length} Explicit ECs
-                  </p>
-                  <div className="mt-1.5 flex flex-wrap gap-1">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <p className="font-mono text-xs font-bold uppercase tracking-wider text-[var(--navy)]">
+                      Head {activeClass.modelHead} · {activeClass.ecs.length} ECs
+                    </p>
+                    <Link
+                      href="/ec-numbers"
+                      className="text-xs font-bold text-[var(--teal)] hover:underline"
+                    >
+                      All 52 ECs →
+                    </Link>
+                  </div>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
                     {activeClass.ecs.map((ec) => (
                       <a
                         key={ec}
@@ -384,16 +334,12 @@ export default function HomePage() {
                         target="_blank"
                         rel="noreferrer"
                         title={`Open EC ${ec} in BRENDA`}
-                        className={`border px-1.5 py-0.5 font-mono text-[11px] font-bold transition ${
-                          highlightedEc === ec
-                            ? 'border-[var(--ochre-dark)] bg-[var(--pyrite)] text-[#0c1b1d]'
-                            : 'border-[var(--line-strong)] bg-white text-[var(--navy)] hover:border-[var(--navy)]'
-                        }`}
+                        className="rounded-md border border-[var(--line-strong)] bg-white px-2 py-0.5 font-mono text-xs font-bold text-[var(--navy)] transition hover:border-[var(--teal)] hover:bg-[var(--teal-soft)]"
                       >
                         {ec}
                       </a>
                     ))}
-                    <span className="border border-dashed border-[var(--field-border)] bg-white px-1.5 py-0.5 font-mono text-[11px] text-[var(--muted)]">
+                    <span className="rounded-md border border-dashed border-[var(--field-border)] bg-white px-2 py-0.5 font-mono text-xs font-medium text-[var(--ink-secondary)]">
                       Others
                     </span>
                   </div>
@@ -402,220 +348,126 @@ export default function HomePage() {
 
               <Link
                 href={`/prediction?example=${activeClass.key}`}
-                className="btn-ochre w-full !text-xs"
+                className="btn-ochre w-full text-sm"
               >
-                <span>Load {activeClass.code} Specimen →</span>
+                <span>Load {activeClass.code} Example →</span>
               </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ==================== SECTION 2: FULL-WIDTH COMPUTATIONAL CASCADE + 4 GATE BENCHMARK STRIP ==================== */}
-      <section aria-labelledby="cascade-section-heading" className="pt-12">
-        <div className="flex flex-col justify-between gap-3 pb-4 lg:flex-row lg:items-end">
+      {/* ==================== SECTION 2: FOUR-PHASE ESM-2 ARCHITECTURE ==================== */}
+      <section aria-labelledby="cascade-section-heading" className="space-y-4">
+        <div className="flex flex-col justify-between gap-3 lg:flex-row lg:items-end">
           <div>
-            <p className="eyebrow">Alignment-Free Architecture &amp; Homology-Disjoint Validation</p>
+            <p className="eyebrow">Prediction Workflow</p>
             <h2
               id="cascade-section-heading"
-              className="mt-1 font-display text-2xl font-bold text-[var(--navy)] sm:text-3xl"
+              className="mt-1 font-display text-2xl font-bold text-[var(--navy)] sm:text-[1.7rem]"
             >
-              Overlap-averaged ESM-2 windowing &amp; cumulative four-gate screening
+              Four-phase ESM-2 classification pipeline
             </h2>
           </div>
-          <p className="max-w-xl text-xs leading-relaxed text-[var(--muted)] lg:text-right">
-            Proteins exceeding 1,022 residues are encoded across overlapping 1,022-aa windows
-            (511-aa stride + terminal <code className="font-mono">[L−1022:L]</code>), preserving
-            94.7%–100.0% test accuracy on long multi-domain soil proteases.
+          <p className="max-w-xl text-[15px] leading-6 text-[var(--ink-secondary)] lg:text-right">
+            Sequences longer than 1,022 residues are encoded across overlapping 1,022-aa windows
+            (511-aa stride) before passing through four sequential neural stages.
           </p>
         </div>
 
-        <div className="border border-[var(--line)] border-t-2 border-t-[var(--navy)] bg-white">
+        <div className="overflow-hidden rounded-2xl border border-[var(--line-strong)] bg-white shadow-[0_2px_12px_rgba(18,38,40,0.04)]">
           <div className="p-4 sm:p-6">
-            <EsmCascadeSVG selected={selectedKey} onSelect={handleSelectClass} />
+            <EsmCascadeSVG selected={selectedKey} onSelect={setSelectedKey} />
           </div>
 
-          {/* 4 Aligned Gate Columns Directly Beneath the Cascade Plate */}
-          <div className="grid divide-y divide-[var(--line)] border-t border-[var(--line)] bg-[var(--limestone)] sm:grid-cols-2 sm:divide-x lg:grid-cols-4 lg:divide-y-0">
-            {GATE_SUMMARY.map((g) => (
-              <div key={g.gate} className="p-4 sm:p-5">
-                <div className="flex items-baseline justify-between gap-2 font-mono text-xs">
-                  <span className="font-extrabold uppercase text-[var(--teal)]">{g.gate}</span>
-                  <span className="text-[11px] font-semibold text-[var(--muted)]">{g.cutoff}</span>
-                </div>
+          {/* 4 Aligned Phase Columns */}
+          <div className="grid divide-y divide-[var(--line)] border-t border-[var(--line-strong)] bg-[var(--limestone)] sm:grid-cols-2 sm:divide-x lg:grid-cols-4 lg:divide-y-0">
+            {PHASE_SUMMARY.map((g) => (
+              <div key={g.phase} className="p-5">
+                <span className="font-mono text-xs font-extrabold uppercase text-[var(--teal)]">
+                  {g.phase}
+                </span>
                 <h3 className="mt-1 font-display text-lg font-bold text-[var(--navy)]">
                   {g.title}
                 </h3>
-                <div className="mt-2 flex items-baseline gap-3 border-y border-[var(--line)] bg-white px-2.5 py-1.5 font-mono text-xs">
-                  <span>
-                    Acc <strong className="text-[var(--navy)]">{g.acc}</strong>
-                  </span>
-                  <span className="text-[var(--line-strong)]">·</span>
-                  <span>
-                    MCC <strong className="text-[var(--ochre)]">{g.mcc}</strong>
-                  </span>
+                <div className="mt-2 rounded-lg border border-[var(--line-strong)] bg-white px-3 py-1.5 font-mono text-xs font-bold text-[var(--navy)]">
+                  {g.output}
                 </div>
-                <p className="mt-2.5 text-xs leading-relaxed text-[var(--muted)]">{g.detail}</p>
+                <p className="mt-2.5 text-sm leading-relaxed text-[var(--ink)]">{g.detail}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ==================== SECTION 3: PERIODIC ATLAS OF ALL 52 EXPLICIT FOUR-DIGIT ECs ==================== */}
-      <section aria-labelledby="periodic-ec-heading" className="border-b border-[var(--line)] py-12">
-        <div className="flex flex-col justify-between gap-2 pb-5 sm:flex-row sm:items-end">
-          <div>
-            <p className="eyebrow">Phase IV Specialist Nomenclature Scope</p>
-            <h2
-              id="periodic-ec-heading"
-              className="mt-1 font-display text-2xl font-bold text-[var(--navy)] sm:text-3xl"
-            >
-              Periodic Reference Grid of the 52 Explicit Four-Digit ECs
-            </h2>
-          </div>
-          <p className="font-mono text-xs text-[var(--muted)]">
-            Click any EC tile to inspect its parent enzyme class above ·{' '}
-            <a
-              href={`https://www.brenda-enzymes.org/enzyme.php?ecno=${highlightedEc}`}
-              target="_blank"
-              rel="noreferrer"
-              className="font-bold text-[var(--ochre)] underline underline-offset-4 hover:text-[var(--navy)]"
-            >
-              Inspect {highlightedEc} in BRENDA ↗
-            </a>
-          </p>
-        </div>
-
-        <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-9">
-          {ALL_EXPLICIT_ECS.map((item) => {
-            const isExact = item.ec === highlightedEc;
-            const isSameClass = item.classKey === selectedKey;
-            return (
-              <button
-                key={item.ec}
-                type="button"
-                onClick={() => handleSelectEcTile(item.classKey, item.ec)}
-                className={`border p-2 text-left transition ${
-                  isExact
-                    ? 'border-[var(--ochre-dark)] bg-[var(--ochre-soft)] shadow-[inset_3px_0_0_var(--pyrite-indicator)]'
-                    : isSameClass
-                      ? 'border-[var(--navy)] bg-[var(--limestone)]'
-                      : 'border-[var(--line)] bg-white hover:border-[var(--navy)] hover:bg-[var(--limestone)]'
-                }`}
-              >
-                <div className="flex items-center justify-between font-mono text-[10px] font-extrabold">
-                  <span
-                    className={
-                      item.code === 'AH' ? 'text-[var(--ochre)]' : 'text-[var(--teal)]'
-                    }
-                  >
-                    {item.code}
-                  </span>
-                  <span className="text-[var(--muted)]">{item.classId}</span>
-                </div>
-                <div className="mt-1 font-mono text-xs font-extrabold text-[var(--navy)]">
-                  {item.ec}
-                </div>
-                <div className="mt-0.5 truncate text-[10px] text-[var(--muted)]">
-                  {item.stageShort}
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* ==================== SECTION 4: 3-COLUMN MONOGRAPH COLOPHON ==================== */}
+      {/* ==================== SECTION 3: STANDALONE CLI + PRIMARY REFERENCE ==================== */}
       <section
-        aria-label="Proteome discovery, standalone CLI, and citation"
-        className="grid gap-8 pt-10 lg:grid-cols-3"
+        aria-label="Standalone CLI and citation"
+        className="grid gap-6 border-t border-[var(--line-strong)] pt-10 lg:grid-cols-2"
       >
-        {/* Column 1: 30 Reference Proteomes Application */}
-        <div className="space-y-2.5 border-t-2 border-[var(--teal)] pt-4">
-          <p className="font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--teal)]">
-            Ecological Genome Application
-          </p>
-          <h3 className="font-display text-xl font-bold text-[var(--navy)]">
-            30 Bacterial &amp; Archaeal Soil Proteomes
-          </h3>
-          <p className="text-xs leading-relaxed text-[var(--muted)] sm:text-[13px]">
-            Applied across <strong>128,830 proteins</strong> spanning Nitrososphaerota,
-            Actinomycetota, Bacteroidota, Bacillota, and Pseudomonadota, MINpred identified{' '}
-            <strong>3,896 mineralization enzymes</strong>, assigned{' '}
-            <strong>2,128 explicit four-digit ECs</strong>, and uncovered{' '}
-            <strong>369 uncharacterized hypothetical proteins</strong> representing candidate soil
-            hydrolases.
-          </p>
-        </div>
-
-        {/* Column 2: Standalone Python CLI */}
-        <div className="space-y-2.5 border-t-2 border-[var(--navy)] pt-4">
+        <div className="space-y-3 rounded-2xl border border-[var(--line-strong)] bg-[var(--surface)] p-5">
           <div className="flex items-baseline justify-between gap-2">
-            <p className="font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--navy)]">
-              Standalone Python CLI
-            </p>
+            <p className="eyebrow">Standalone Python CLI</p>
             <Link
               href="/download"
-              className="font-mono text-xs font-bold text-[var(--teal)] hover:underline"
+              className="text-sm font-bold text-[var(--teal)] hover:underline"
             >
-              .tar.gz &amp; SHA-256 →
+              Download .tar.gz →
             </Link>
           </div>
-          <div className="rounded-[2px] border border-[var(--navy-dark)] bg-[#142a2c] text-white">
-            <div className="flex items-center justify-between border-b border-white/15 px-3 py-1.5 font-mono text-[11px] text-slate-300">
+          <div className="overflow-hidden rounded-xl border border-[var(--navy-dark)] bg-[#122628] text-white">
+            <div className="flex items-center justify-between border-b border-white/15 px-3.5 py-2 font-mono text-xs text-slate-200">
               <span>bash / zsh</span>
               <button
                 type="button"
                 onClick={() => void copyCliCommand()}
-                className="inline-flex items-center gap-1 font-mono text-[11px] font-semibold text-slate-200 hover:text-white"
+                className="inline-flex cursor-pointer items-center gap-1.5 font-mono text-xs font-semibold text-white hover:text-[#f5d07a]"
               >
                 {copiedCli ? (
                   <>
-                    <Check className="h-3 w-3 text-[#f5d07a]" aria-hidden="true" />
+                    <Check className="h-3.5 w-3.5 text-[#f5d07a]" aria-hidden="true" />
                     <span>Copied</span>
                   </>
                 ) : (
                   <>
-                    <Copy className="h-3 w-3" aria-hidden="true" />
+                    <Copy className="h-3.5 w-3.5" aria-hidden="true" />
                     <span>Copy</span>
                   </>
                 )}
               </button>
             </div>
-            <pre className="overflow-x-auto px-3 py-2.5 font-mono text-[11.5px] leading-5 text-slate-100">
+            <pre className="overflow-x-auto px-3.5 py-3 font-mono text-[13px] leading-6 text-slate-100">
               <code>{CLI_SNIPPET}</code>
             </pre>
           </div>
         </div>
 
-        {/* Column 3: Citation & BibTeX */}
-        <div className="space-y-3 border-t-2 border-[var(--pyrite-indicator)] pt-4">
-          <p className="font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--ochre)]">
-            Citation &amp; Reproducibility
-          </p>
-          <p className="text-xs leading-relaxed text-[var(--ink)] sm:text-[13px]">
-            Duhan, N., Norton, J. M., &amp; Kaundal, R. (2026).{' '}
-            <em className="font-semibold text-[var(--navy)]">
-              MINpred: A Hierarchical Protein Language Model Framework for Predicting
-              Nitrogen-Mineralization Enzymes
-            </em>{' '}
-            (v1.0.0). Utah State University.
-          </p>
-          <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-col justify-between space-y-3 rounded-2xl border border-[var(--line-strong)] bg-[var(--surface)] p-5">
+          <div className="space-y-2">
+            <p className="eyebrow">Primary Reference</p>
+            <p className="text-[15px] leading-relaxed text-[var(--ink)]">
+              Duhan, N., Norton, J. M., &amp; Kaundal, R. (2026).{' '}
+              <em className="font-semibold text-[var(--navy)]">
+                MINpred: A Hierarchical Protein Language Model Framework for Predicting
+                Nitrogen-Mineralization Enzymes
+              </em>{' '}
+              (v1.0.0). Utah State University.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2.5 pt-1">
             <button
               type="button"
               onClick={() => void copyBibtex()}
-              className="btn-outline-sharp !min-h-0 !py-1.5 !px-3 !text-xs"
+              className="btn-outline-sharp py-2 px-4 text-sm"
             >
               {copiedBib ? (
                 <>
-                  <Check className="h-3.5 w-3.5 text-[var(--teal)]" aria-hidden="true" />
+                  <Check className="h-4 w-4 text-[var(--teal)]" aria-hidden="true" />
                   <span>Copied BibTeX</span>
                 </>
               ) : (
                 <>
-                  <Copy className="h-3.5 w-3.5" aria-hidden="true" />
+                  <Copy className="h-4 w-4" aria-hidden="true" />
                   <span>Copy BibTeX</span>
                 </>
               )}
@@ -624,10 +476,10 @@ export default function HomePage() {
               href="https://github.com/usubioinfo/minpred"
               target="_blank"
               rel="noreferrer"
-              className="btn-ghost-rule !min-h-0 !py-1.5 !px-3 !text-xs"
+              className="btn-ghost-rule py-2 px-4 text-sm"
             >
               <span>GitHub</span>
-              <ExternalLink className="h-3 w-3" aria-hidden="true" />
+              <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
             </a>
           </div>
         </div>
